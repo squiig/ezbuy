@@ -11,6 +11,8 @@ public class EzBuy extends JavaPlugin {
 			getServer().getPluginManager().disablePlugin(this);
 			return;
 		}
+		
+        this.getCommand("buy").setExecutor(new CommandBuy());
 	}
 
 	@Override
