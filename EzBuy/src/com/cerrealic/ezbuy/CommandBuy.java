@@ -16,6 +16,10 @@ public class CommandBuy implements CommandExecutor {
 			return true;
 		}
 		
+		if (args.length == 0 || args.length > 2) {
+			return false;
+		}
+		
 		Player player = (Player) sender;
 		int amount = -1;
 		
