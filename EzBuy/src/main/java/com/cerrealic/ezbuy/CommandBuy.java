@@ -102,8 +102,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
 			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
-					+ "many of this item. The maximum you can buy right now is %s &s.",
-					Math.floor(bal / cost), item.name()));
+					+ "many of this item. The maximum you can buy right now is %sx %s.",
+					(int) Math.floor(bal / cost), item.name()));
 			return;
 		}
 
@@ -112,8 +112,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			player.sendMessage(String.format("Successfully bought %sx %s for %s! You now have %s",
-					amount, item.name(), economy.format(r.amount), economy.format(r.balance)));
+			player.sendMessage(String.format("Successfully bought %sx %s for %s at %s each! You "
+							+ "now "
+							+ "have %s",
+					amount, item.name(), economy.format(r.amount), cost,
+					economy.format(r.balance)));
 		} else {
 			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
 			return;
