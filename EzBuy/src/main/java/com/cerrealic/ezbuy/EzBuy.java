@@ -1,8 +1,14 @@
 package com.cerrealic.ezbuy;
 
+import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.List;
 
 public class EzBuy extends JavaPlugin {
 
@@ -25,7 +31,9 @@ public class EzBuy extends JavaPlugin {
 			return;
 		}
 
-		this.getCommand("buy").setExecutor(new CommandBuy(this));
+		CommandBuy buy = new CommandBuy(this);
+		this.getCommand(buy.getLabel()).setExecutor(buy);
+		this.getCommand(buy.getLabel()).setTabCompleter(buy);
 		this.saveDefaultConfig();
 	}
 
@@ -57,5 +65,9 @@ public class EzBuy extends JavaPlugin {
 
 	public static Economy getEconomy() {
 		return economy;
+	}
+
+	public Essentials getEssentials() {
+		return (Essentials) getServer().getPluginManager().getPlugin("Essentials");
 	}
 }
