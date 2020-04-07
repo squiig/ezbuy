@@ -88,6 +88,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		return true;
 	}
 
+	private void messageCost(Player player, String itemName, double cost) {
+		player.sendMessage(String.format("One (1x) of %s currently costs %s", itemName,
+				economy.format(cost)));
+	}
+
 	private void buy(Player player, Material item, int amount) {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 		ItemStack stack = new ItemStack(item, amount);
@@ -99,6 +104,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Ensure the player can buy even one of this item
 		if (bal < cost) {
 			player.sendMessage("Buying failed: You don't have enough money to buy this item.");
+			messageCost(player, itemName, cost);
 			return;
 		}
 
@@ -107,6 +113,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
 					+ "many of this item. The maximum you can buy right now is %sx %s.",
 					(int) Math.floor(bal / cost), itemName));
+			messageCost(player, itemName, cost);
 			return;
 		}
 
@@ -118,7 +125,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			player.sendMessage(String.format("Successfully bought %sx %s for %s at %s each! You "
 							+ "now "
 							+ "have %s",
-					amount, itemName, economy.format(r.amount), cost,
+					amount, itemName, economy.format(r.amount), economy.format(cost),
 					economy.format(r.balance)));
 		} else {
 			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
@@ -132,11 +139,13 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender,
 			Command command, String alias, String[] args) {
-		List<String> answers = new ArrayList<>(Arrays.asList("1", "2", "3", "5", "10", "16", "32", "64"));
+		List<String> answers = new ArrayList<>();
 		if (args.length == 1) {
 			for (Material material : Material.values()) {
 				answers.add(material.name().toLowerCase());
 			}
+		} else {
+			answers = Arrays.asList("1", "2", "3", "5", "10", "16", "32", "64");
 		}
 		return answers;
 	}
