@@ -18,13 +18,6 @@ public class EzBuy extends JavaPlugin {
 			return;
 		}
 
-		if (!serverHasVault()) {
-			getLogger().severe("This plugin requires Vault, which you don't seem to have "
-					+ "installed. Please install the Vault plugin.");
-			disablePlugin();
-			return;
-		}
-
 		if (!trySetupEconomy()) {
 			getLogger().severe("Could not detect an economy service! Something probably went "
 					+ "wrong with Vault.");
@@ -33,7 +26,6 @@ public class EzBuy extends JavaPlugin {
 		}
 
 		this.getCommand("buy").setExecutor(new CommandBuy(this));
-
 		this.saveDefaultConfig();
 	}
 
@@ -42,13 +34,9 @@ public class EzBuy extends JavaPlugin {
 
 	}
 
-	private void disablePlugin() {
+	public void disablePlugin() {
 		getLogger().severe("Plugin disabled!");
 		getServer().getPluginManager().disablePlugin(this);
-	}
-
-	private boolean serverHasVault() {
-		return getServer().getPluginManager().getPlugin("Vault") != null;
 	}
 
 	private boolean trySetupEconomy() {

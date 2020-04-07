@@ -1,6 +1,6 @@
 name: EzBuy
 main: com.cerrealic.ezbuy.EzBuy
-version: 0.1.0a-pre8
+version: 0.1.0a-pre9
 api-version: 1.15
 author: cerrealic
 depend:
@@ -9,5 +9,5 @@ depend:
 commands:
   buy:
     description: Buy items from the server using your balance and the defined worth of the item.
-    usage: /<command> <item>
+    usage: /<command> <item> <amount>
     aliases: purchase
