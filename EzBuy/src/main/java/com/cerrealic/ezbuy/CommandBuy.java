@@ -87,7 +87,7 @@ public class CommandBuy implements CommandExecutor {
 
 		if (bal < amount * cost) {
 			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
-					+ "many of this item. The maximum you can buy right now is %d.",
+					+ "many of this item. The maximum you can buy right now is %s.",
 					Math.floor(bal / cost)));
 			return;
 		}
