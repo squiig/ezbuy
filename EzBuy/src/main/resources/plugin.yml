@@ -1,9 +1,11 @@
 name: EzBuy
 main: com.cerrealic.ezbuy.EzBuy
-version: 0.1.0a-pre4
+version: 0.1.0a-pre5
 api-version: 1.15
-authors: [cerrealic]
+author: cerrealic
+depend: Vault
 commands:
   buy:
     description: Buy items from the server using your balance and the defined worth of the item.
     usage: /<command> <item> <amount>
+    aliases: purchase
