@@ -38,7 +38,7 @@ public class CommandBuy implements CommandExecutor {
 		int amount = 1;
 
 		try {
-			amount = Integer.parseInt(args[1]);
+			amount = Integer.parseInt(args[0]);
 		} catch (NumberFormatException ex) {
 			sender.sendMessage("&cBuying failed: The amount you entered was not a valid number.");
 			return false;

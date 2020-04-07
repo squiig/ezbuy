@@ -33,6 +33,8 @@ public class EzBuy extends JavaPlugin {
 		}
 
 		this.getCommand("buy").setExecutor(new CommandBuy(this));
+
+		this.saveDefaultConfig();
 	}
 
 	@Override

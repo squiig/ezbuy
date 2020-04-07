@@ -1,5 +1,5 @@
 # Local .bashrc for LoadLifter
 
-alias launch='bash launch.sh'
-alias bump='bash bump.sh'
+alias launch='./launch.sh'
+alias bump='./bump.sh'
 

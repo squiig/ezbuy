@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.cerrealic'
-version '0.1.0a-pre4-SNAPSHOT'
+version '0.1.0a-pre8-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
