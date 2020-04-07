@@ -46,10 +46,6 @@ public class CommandBuy implements CommandExecutor {
 		}
 
 		Player player = (Player) sender;
-		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
-
-		//sender.sendMessage(String.format("You have %s", economy.format(economy.getBalance
-		// (player))));
 
 		// Is the given item name a real item?
 		if (Material.matchMaterial(args[0]) == null) {
@@ -75,19 +71,37 @@ public class CommandBuy implements CommandExecutor {
 			return true;
 		}
 
+		buy(player, item, amount);
+		return true;
+	}
+
+	private void buy(Player player, Material item, int amount) {
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
+		int cost = 1; // placeholder
+		double bal = economy.getBalance(offlinePlayer);
+
+		if (bal < cost) {
+			player.sendMessage("Buying failed: You don't have enough money to buy this item.");
+			return;
+		}
+
+		if (bal < amount * cost) {
+			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
+					+ "many of this item. The maximum you can buy right now is %d.",
+					Math.floor(bal / cost)));
+			return;
+		}
+
 		EconomyResponse r = economy.withdrawPlayer(offlinePlayer, amount);
 
 		if(r.transactionSuccess()) {
-			sender.sendMessage(String.format("You were given %s and now have %s",
+			player.sendMessage(String.format("You paid %s and now have %s",
 					economy.format(r.amount), economy.format(r.balance)));
 		} else {
-			sender.sendMessage(String.format("An error occurred: %s", r.errorMessage));
+			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
 		}
 
 		ItemStack stack = new ItemStack(item, amount);
 		player.getInventory().addItem(stack);
-
-		return true;
 	}
-
 }
