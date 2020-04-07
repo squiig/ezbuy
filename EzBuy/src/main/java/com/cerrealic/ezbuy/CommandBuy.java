@@ -13,6 +13,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -34,7 +35,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// Ensure the sender is a player and not a console or command block
 		if (!(sender instanceof Player)) {
-			sender.sendMessage("The /buy command is only available to players.");
+			sender.sendMessage("The /buy command is only available to players!");
 			return true;
 		}
 
@@ -45,14 +46,14 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		Player player = (Player) sender;
 
-		// Is the given item name a real item?
-		if (Material.matchMaterial(args[0]) == null) {
-			sender.sendMessage("Buying failed: That's not a valid item.");
-			return false;
-		}
-
 		// Figure out what item was meant with the argument
 		Material item = Material.matchMaterial(args[0]);
+
+		// Is the given item name a known item?
+		if (item == null) {
+			sender.sendMessage("Buying failed: Unknown item.");
+			return false;
+		}
 
 		// Define the amount and init with default value if none given
 		int amount = 1;
@@ -89,6 +90,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	private void buy(Player player, Material item, int amount) {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 		ItemStack stack = new ItemStack(item, amount);
+		String itemName = item.name().toLowerCase();
 		double cost = essentials.getWorth().getPrice(essentials, stack).doubleValue();
 		double bal = economy.getBalance(offlinePlayer);
 		double totalCost = cost * amount;
@@ -103,7 +105,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		if (bal < totalCost) {
 			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
 					+ "many of this item. The maximum you can buy right now is %sx %s.",
-					(int) Math.floor(bal / cost), item.name()));
+					(int) Math.floor(bal / cost), itemName));
 			return;
 		}
 
@@ -115,7 +117,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			player.sendMessage(String.format("Successfully bought %sx %s for %s at %s each! You "
 							+ "now "
 							+ "have %s",
-					amount, item.name(), economy.format(r.amount), cost,
+					amount, itemName, economy.format(r.amount), cost,
 					economy.format(r.balance)));
 		} else {
 			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
@@ -129,7 +131,15 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender,
 			Command command, String alias, String[] args) {
-		return Stream.of(Material.values()).map(Material::name).collect(Collectors.toList());
+		if (args.length == 1) {
+			List<String> names = new ArrayList<>();
+			for (Material material : Material.values()) {
+				names.add(material.name().toLowerCase());
+			}
+			return names;
+		} else {
+			return null;
+		}
 	}
 
 	public String getLabel() {
