@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -131,15 +132,13 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender,
 			Command command, String alias, String[] args) {
+		List<String> answers = new ArrayList<>(Arrays.asList("1", "2", "3", "5", "10", "16", "32", "64"));
 		if (args.length == 1) {
-			List<String> names = new ArrayList<>();
 			for (Material material : Material.values()) {
-				names.add(material.name().toLowerCase());
+				answers.add(material.name().toLowerCase());
 			}
-			return names;
-		} else {
-			return null;
 		}
+		return answers;
 	}
 
 	public String getLabel() {
