@@ -32,11 +32,13 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		// Ensure the sender is a player and not a console or command block
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("The /buy command is only available to players.");
 			return true;
 		}
 
+		// Ensure correct arg amount
 		if (args.length == 0 || args.length > 2) {
 			return false;
 		}
@@ -49,16 +51,24 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			return false;
 		}
 
+		// Figure out what item was meant with the argument
 		Material item = Material.matchMaterial(args[0]);
+
+		// Define the amount and init with default value if none given
 		int amount = 1;
 
+		// Only try to parse amount if the arg was given
 		if (args.length > 1) {
 			try {
 				amount = Integer.parseInt(args[1]);
-			} catch (NumberFormatException ex) {
+			}
+			// This is the only exception we can expect
+			catch (NumberFormatException ex) {
 				sender.sendMessage("Buying failed: The amount you entered was not a valid number.");
 				return false;
-			} catch (Exception e) {
+			}
+			// Any other kind
+			catch (Exception e) {
 				sender.sendMessage(
 						"Buying failed: There was an unexpected error with the amount you"
 								+ " entered. Please ask a server admin for help.");
@@ -66,10 +76,12 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			}
 		}
 
+		// If somehow the amount ended up being 0 or lower anyway, then silently fail for now
 		if (amount <= 0) {
 			return true;
 		}
 
+		// Execute the order
 		buy(player, item, amount);
 		return true;
 	}
@@ -79,28 +91,35 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		ItemStack stack = new ItemStack(item, amount);
 		double cost = essentials.getWorth().getPrice(essentials, stack).doubleValue();
 		double bal = economy.getBalance(offlinePlayer);
+		double totalCost = cost * amount;
 
+		// Ensure the player can buy even one of this item
 		if (bal < cost) {
 			player.sendMessage("Buying failed: You don't have enough money to buy this item.");
 			return;
 		}
 
-		if (bal < amount * cost) {
+		// Ensure the player can buy this exact amount
+		if (bal < totalCost) {
 			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
-					+ "many of this item. The maximum you can buy right now is %s.",
-					Math.floor(bal / cost)));
+					+ "many of this item. The maximum you can buy right now is %s &s.",
+					Math.floor(bal / cost), item.name()));
 			return;
 		}
 
-		EconomyResponse r = economy.withdrawPlayer(offlinePlayer, cost);
+		// Withdraw the total cost of the player's balance
+		EconomyResponse r = economy.withdrawPlayer(offlinePlayer, totalCost);
 
-		if(r.transactionSuccess()) {
-			player.sendMessage(String.format("You paid %s and now have %s",
-					economy.format(r.amount), economy.format(r.balance)));
+		// Send a message of either success or failure
+		if (r.transactionSuccess()) {
+			player.sendMessage(String.format("Successfully bought %sx %s for %s! You now have %s",
+					amount, item.name(), economy.format(r.amount), economy.format(r.balance)));
 		} else {
 			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
+			return;
 		}
 
+		// Give the items to the player
 		player.getInventory().addItem(stack);
 	}
 
