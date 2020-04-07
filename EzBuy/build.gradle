@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.cerrealic'
-version '0.1.0a-pre11-SNAPSHOT'
+version '0.1.0a-pre12-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
@@ -46,4 +46,5 @@ dependencies {
 	//compileOnly 'org.bukkit:craftbukkit:1.14.4-R0.1-SNAPSHOT' // The full CraftBukkit server with no shadowing. Requires mavenLocal.
 
 	compileOnly "com.github.MilkBowl:VaultAPI:1.7"
+	compileOnly "org.yaml:snakeyaml:1.26"
 }

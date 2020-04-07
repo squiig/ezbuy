@@ -10,7 +10,9 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.yaml.snakeyaml.Yaml;
 
+import java.io.InputStream;
 import java.util.Map;
 
 public class CommandBuy implements CommandExecutor {
@@ -22,20 +24,27 @@ public class CommandBuy implements CommandExecutor {
 		this.plugin = plugin;
 		economy = plugin.getEconomy();
 
-		if (!tryGetWorthData()) {
+		if (tryGetWorthData() == null) {
 			plugin.getLogger().severe("Could not read Essentials' worth.yml file! Please make "
 					+ "sure it's there, otherwise this plugin doesn't have much use.");
 			plugin.disablePlugin();
 		}
 	}
 
-	private boolean tryGetWorthData() {
-		//plugin.getServer().getPluginManager().getPlugin("Essentials").getResource("worth.yml");
-		return true;
+	private Object tryGetWorthData() {
+		plugin.getLogger().fine("Attempting to load worth.yml...");
+		Yaml yaml = new Yaml();
+		InputStream is = plugin.getServer().getPluginManager().getPlugin("Essentials").getResource(
+				"worth.yml");
+		Object obj = yaml.load(is);
+		plugin.getLogger().fine(obj.toString());
+		return obj;
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		sender.sendMessage(tryGetWorthData().toString());
+
 		if (!(sender instanceof Player)) {
 			sender.sendMessage("The /buy command is only available to players.");
 			return true;
@@ -56,15 +65,18 @@ public class CommandBuy implements CommandExecutor {
 		Material item = Material.matchMaterial(args[0]);
 		int amount = 1;
 
-		try {
-			amount = Integer.parseInt(args[1]);
-		} catch (NumberFormatException ex) {
-			sender.sendMessage("Buying failed: The amount you entered was not a valid number.");
-			return false;
-		} catch (Exception e) {
-			sender.sendMessage("Buying failed: There was an unexpected error with the amount you"
-					+ " entered. Please ask a server admin for help.");
-			return false;
+		if (args.length > 1) {
+			try {
+				amount = Integer.parseInt(args[1]);
+			} catch (NumberFormatException ex) {
+				sender.sendMessage("Buying failed: The amount you entered was not a valid number.");
+				return false;
+			} catch (Exception e) {
+				sender.sendMessage(
+						"Buying failed: There was an unexpected error with the amount you"
+								+ " entered. Please ask a server admin for help.");
+				return false;
+			}
 		}
 
 		if (amount <= 0) {
