@@ -13,6 +13,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,6 +24,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	private IEssentials essentials;
 	private String label;
 	private double buyPriceIncrease = .05f; // default
+	private Player player;
 
 	public CommandBuy(EzBuy plugin) {
 		this.plugin = plugin;
@@ -46,7 +48,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			return false;
 		}
 
-		Player player = (Player) sender;
+		player = (Player) sender;
 
 		// Figure out what item was meant with the argument
 		Material item = Material.matchMaterial(args[0]);
@@ -85,37 +87,47 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		}
 
 		// Execute the order
-		buy(player, item, amount);
+		buy(item, amount);
 		return true;
 	}
 
-	private void messageCost(Player player, String itemName, double cost) {
+	private void alertCost(Player player, String itemName, double cost) {
 		player.sendMessage(String.format("One (1x) of %s currently costs %s", itemName,
 				economy.format(cost)));
 	}
 
-	private void buy(Player player, Material item, int amount) {
+	private void fail(String message) {
+		player.sendMessage("Purchase failed: " + message);
+	}
+
+	private void buy(Material item, int amount) {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 		ItemStack stack = new ItemStack(item, amount);
 		String itemName = item.name().toLowerCase();
-		double cost = essentials.getWorth().getPrice(essentials, stack).doubleValue()
-						* (1 + buyPriceIncrease);
+		BigDecimal rawCost = essentials.getWorth().getPrice(essentials, stack);
+
+		if (rawCost == null) {
+			fail("Could not find corresponding worth of this item. To fix, notify a server admin.");
+			return;
+		}
+
+		double cost = rawCost.doubleValue()	* (1 + buyPriceIncrease);
 		double bal = economy.getBalance(offlinePlayer);
 		double totalCost = cost * amount;
 
 		// Ensure the player can buy even one of this item
 		if (bal < cost) {
-			player.sendMessage("Buying failed: You don't have enough money to buy this item.");
-			messageCost(player, itemName, cost);
+			fail("You don't have enough money to buy this item.");
+			alertCost(player, itemName, cost);
 			return;
 		}
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			player.sendMessage(String.format("Buying failed: You don't have enough money to buy that "
-					+ "many of this item. The maximum you can buy right now is %sx %s.",
+			fail(String.format("You don't have enough money to buy that many of this item. The "
+							+ "maximum you can buy right now is %sx %s.",
 					(int) Math.floor(bal / cost), itemName));
-			messageCost(player, itemName, cost);
+			alertCost(player, itemName, cost);
 			return;
 		}
 
@@ -147,7 +159,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 				answers.add(material.name().toLowerCase());
 			}
 		} else {
-			answers = Arrays.asList("1", "2", "3", "5", "10", "16", "32", "64");
+			answers = Arrays.asList("<amount>");
 		}
 		return answers;
 	}
