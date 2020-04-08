@@ -2,13 +2,8 @@ package com.cerrealic.ezbuy;
 
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
 
 public class EzBuy extends JavaPlugin {
 
@@ -24,7 +19,7 @@ public class EzBuy extends JavaPlugin {
 			return;
 		}
 
-		if (!trySetupEconomy()) {
+		if (!tryLoadEconomy()) {
 			getLogger().severe("Could not detect an economy service! Something probably went "
 					+ "wrong with Vault.");
 			disablePlugin();
@@ -47,7 +42,7 @@ public class EzBuy extends JavaPlugin {
 		getServer().getPluginManager().disablePlugin(this);
 	}
 
-	private boolean trySetupEconomy() {
+	private boolean tryLoadEconomy() {
 		RegisteredServiceProvider<Economy> rsp =
 				getServer().getServicesManager().getRegistration(Economy.class);
 
