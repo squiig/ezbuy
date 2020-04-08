@@ -24,13 +24,15 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	private Economy economy;
 	private IEssentials essentials;
 	private String label;
-	private float buyPriceIncrease = .05f;
+	private double buyPriceIncrease = .05f; // default
 
 	public CommandBuy(EzBuy plugin) {
 		this.plugin = plugin;
 		label = "buy";
 		economy = plugin.getEconomy();
 		essentials = plugin.getEssentials();
+
+		buyPriceIncrease = plugin.getConfig().getDouble("cost-increase");
 	}
 
 	@Override
