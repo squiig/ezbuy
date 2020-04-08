@@ -24,6 +24,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	private Economy economy;
 	private IEssentials essentials;
 	private String label;
+	private float buyPriceIncrease = .05f;
 
 	public CommandBuy(EzBuy plugin) {
 		this.plugin = plugin;
@@ -97,7 +98,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 		ItemStack stack = new ItemStack(item, amount);
 		String itemName = item.name().toLowerCase();
-		double cost = essentials.getWorth().getPrice(essentials, stack).doubleValue();
+		double cost = essentials.getWorth().getPrice(essentials, stack).doubleValue()
+						* (1 + buyPriceIncrease);
 		double bal = economy.getBalance(offlinePlayer);
 		double totalCost = cost * amount;
 
