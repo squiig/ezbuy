@@ -23,7 +23,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	private Economy economy;
 	private IEssentials essentials;
 	private String label;
-	private double buyPriceIncrease = .05f; // default
+	private double buyPriceIncrease;
 	private Player player;
 
 	public CommandBuy(EzBuy plugin) {
@@ -35,11 +35,20 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		buyPriceIncrease = plugin.getConfig().getDouble("cost-increase");
 	}
 
+	private void alertCost(Player player, String itemName, double cost) {
+		player.sendMessage(String.format("One (1x) of %s currently costs %s", itemName,
+				economy.format(cost)));
+	}
+
+	private void fail(String message, Object... formatArgs) {
+		player.sendMessage(String.format("§cPurchase failed: %s§a", message, formatArgs));
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// Ensure the sender is a player and not a console or command block
 		if (!(sender instanceof Player)) {
-			sender.sendMessage("The /buy command is only available to players!");
+			sender.sendMessage("§cThe /buy command is only available to players!§a");
 			return true;
 		}
 
@@ -55,7 +64,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Is the given item name a known item?
 		if (item == null) {
-			sender.sendMessage("Buying failed: Unknown item.");
+			fail("Unknown item.");
 			return false;
 		}
 
@@ -69,14 +78,13 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			}
 			// This is the only exception we can expect
 			catch (NumberFormatException ex) {
-				sender.sendMessage("Buying failed: The amount you entered was not a valid number.");
+				fail("The amount you entered was not a valid number.");
 				return false;
 			}
 			// Any other kind
 			catch (Exception e) {
-				sender.sendMessage(
-						"Buying failed: There was an unexpected error with the amount you"
-								+ " entered. Please ask a server admin for help.");
+				fail("There was an unexpected error with the amount you entered. Please ask a "
+						+ "server admin for help.");
 				return false;
 			}
 		}
@@ -89,15 +97,6 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Execute the order
 		buy(item, amount);
 		return true;
-	}
-
-	private void alertCost(Player player, String itemName, double cost) {
-		player.sendMessage(String.format("One (1x) of %s currently costs %s", itemName,
-				economy.format(cost)));
-	}
-
-	private void fail(String message) {
-		player.sendMessage("Purchase failed: " + message);
 	}
 
 	private void buy(Material item, int amount) {
@@ -124,9 +123,9 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail(String.format("You don't have enough money to buy that many of this item. The "
-							+ "maximum you can buy right now is %sx %s.",
-					(int) Math.floor(bal / cost), itemName));
+			fail("You don't have enough money to buy that many of this item. The maximum you can "
+							+ "buy right now is §e%sx %s§c.",
+					(int) Math.floor(bal / cost), itemName);
 			alertCost(player, itemName, cost);
 			return;
 		}
@@ -136,13 +135,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			player.sendMessage(String.format("Successfully bought %sx %s for %s at %s each! You "
-							+ "now "
-							+ "have %s",
+			player.sendMessage(String.format("§aBought §e%sx %s§a for §2%s§a at §2%s§a each! You now have §2%s§a",
 					amount, itemName, economy.format(r.amount), economy.format(cost),
 					economy.format(r.balance)));
 		} else {
-			player.sendMessage(String.format("An error occurred: %s", r.errorMessage));
+			fail(r.errorMessage);
 			return;
 		}
 
