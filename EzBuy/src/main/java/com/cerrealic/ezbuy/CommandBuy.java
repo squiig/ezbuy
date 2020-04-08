@@ -4,6 +4,7 @@ import com.earth2me.essentials.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -35,20 +36,35 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		buyPriceIncrease = plugin.getConfig().getDouble("cost-increase");
 	}
 
+	private void notifyPlayer(String message, Object... formatArgs) {
+		player.sendMessage(EzBuy.formatColors(message, formatArgs));
+	}
+
 	private void alertCost(Player player, String itemName, double cost) {
-		player.sendMessage(String.format("One (1x) of %s currently costs %s", itemName,
-				economy.format(cost)));
+		notifyPlayer("&6One (1x) of &e%s&6 currently costs %s", itemName, EzBuy.formatMoney(cost));
 	}
 
 	private void fail(String message, Object... formatArgs) {
-		player.sendMessage(String.format("§cPurchase failed: %s§a", message, formatArgs));
+		notifyPlayer("&cPurchase failed: %s", message, formatArgs);
+	}
+
+	private double getCost(Material item) {
+		BigDecimal rawCost = essentials.getWorth().getPrice(essentials, new ItemStack(item));
+
+		if (rawCost == null) {
+			fail("Could not find corresponding worth of this item. To fix, notify a server admin.");
+			return -1;
+		}
+
+		return rawCost.doubleValue() * (1 + buyPriceIncrease);
 	}
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// Ensure the sender is a player and not a console or command block
 		if (!(sender instanceof Player)) {
-			sender.sendMessage("§cThe /buy command is only available to players!§a");
+			sender.sendMessage(ChatColor.YELLOW + "The /buy command is only available to "
+					+ "players!");
 			return true;
 		}
 
@@ -99,20 +115,12 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		return true;
 	}
 
-	private void buy(Material item, int amount) {
+	private void buy(Material item, int itemAmount) {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
-		ItemStack stack = new ItemStack(item, amount);
 		String itemName = item.name().toLowerCase();
-		BigDecimal rawCost = essentials.getWorth().getPrice(essentials, stack);
-
-		if (rawCost == null) {
-			fail("Could not find corresponding worth of this item. To fix, notify a server admin.");
-			return;
-		}
-
-		double cost = rawCost.doubleValue()	* (1 + buyPriceIncrease);
+		double cost = getCost(item);
 		double bal = economy.getBalance(offlinePlayer);
-		double totalCost = cost * amount;
+		double totalCost = cost * itemAmount;
 
 		// Ensure the player can buy even one of this item
 		if (bal < cost) {
@@ -123,8 +131,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail("You don't have enough money to buy that many of this item. The maximum you can "
-							+ "buy right now is §e%sx %s§c.",
+			fail("You don't have enough money to buy that many of this item. "
+							+ "The maximum you can buy right now is &e%sx %s&c.",
 					(int) Math.floor(bal / cost), itemName);
 			alertCost(player, itemName, cost);
 			return;
@@ -135,16 +143,17 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			player.sendMessage(String.format("§aBought §e%sx %s§a for §2%s§a at §2%s§a each! You now have §2%s§a",
-					amount, itemName, economy.format(r.amount), economy.format(cost),
-					economy.format(r.balance)));
+			player.sendMessage(EzBuy.formatColors("&aBought &e%sx %s&a for %s at %s each!"
+							+ " You now have %s",
+					itemAmount, itemName, EzBuy.formatMoney(r.amount), EzBuy.formatMoney(cost),
+					EzBuy.formatMoney(r.balance)));
 		} else {
 			fail(r.errorMessage);
 			return;
 		}
 
 		// Give the items to the player
-		player.getInventory().addItem(stack);
+		player.getInventory().addItem(new ItemStack(item, itemAmount));
 	}
 
 	@Override
