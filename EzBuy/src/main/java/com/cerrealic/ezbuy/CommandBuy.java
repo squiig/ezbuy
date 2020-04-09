@@ -120,6 +120,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
 		String itemName = item.name().toLowerCase();
 		double cost = getCost(item);
+
+		if (cost < 0) {
+			return;
+		}
+
 		double bal = economy.getBalance(offlinePlayer);
 		double totalCost = cost * itemAmount;
 
