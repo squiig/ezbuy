@@ -41,11 +41,12 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	}
 
 	private void alertCost(Player player, String itemName, double cost) {
-		notifyPlayer("&6One (1x) of &e%s&6 currently costs %s", itemName, EzBuy.formatMoney(cost));
+		notifyPlayer("&6One (&e1x&6) of &e%s&6 currently costs %s", itemName,
+				EzBuy.formatMoney(cost));
 	}
 
 	private void fail(String message, Object... formatArgs) {
-		notifyPlayer("&cPurchase failed: %s", message, formatArgs);
+		notifyPlayer("&cPurchase failed: %s&r", message, formatArgs);
 	}
 
 	private double getCost(Material item) {
@@ -143,7 +144,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			player.sendMessage(EzBuy.formatColors("&aBought &e%sx %s&a for %s at %s each!"
+			player.sendMessage(EzBuy.formatColors("&aBought &e%sx %s&a for %s&a at %s&a each!"
 							+ " You now have %s",
 					itemAmount, itemName, EzBuy.formatMoney(r.amount), EzBuy.formatMoney(cost),
 					EzBuy.formatMoney(r.balance)));
