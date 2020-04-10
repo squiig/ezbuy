@@ -1,1 +1,1 @@
-# ezbuy-plugin
+# EzBuy - Spigot 1.15
