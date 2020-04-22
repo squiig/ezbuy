@@ -1,4 +1,4 @@
-#!/bin/bash
+#
 # bump.sh
 # author: cerrealic
 
@@ -20,12 +20,11 @@ function bump() {
 	}
 
 	usage() {
-		echo -e "${RED}Usage: bump (-c|-S <version>) | (-j|-J, -m|-M, -p|-P [-s <suffix>])${NC}"
+		echo -e "${RED}Usage: bump (-a|-c|-S <version>) | (-j|-J, -m|-M, -p|-P [-s <suffix>])${NC}"
 		echo
 		echo -e "${YELLOW}Flag execution order is as given!${NC}"
 		echo
-		echo -e "Flag descriptions:\n-c ${DGRAY}:${NC} Show what's currently cached\n-S ${DGRAY}:${NC} Bump to a specific version\n-j|-J ${DGRAY}:${NC} Bump the major index (capital for specific)\n-m|-M ${DGRAY}:${NC} Bump the minor index (capital for specific)\n-p|-P ${DGRAY}:${NC} Bump the patch index (capital for specific)\n-s ${DGRAY}:${NC} Add a suffix (Options: ${GREEN}alpha, beta, release, snapshot${NC})"
-		return 1
+		echo -e "Flag descriptions:\n-a ${DGRAY}:${NC} Apply what's currently cached\n-c ${DGRAY}:${NC} Show what's currently cached\n-S ${DGRAY}:${NC} Bump to a specific version\n-j|-J ${DGRAY}:${NC} Bump the major index (capital for specific)\n-m|-M ${DGRAY}:${NC} Bump the minor index (capital for specific)\n-p|-P ${DGRAY}:${NC} Bump the patch index (capital for specific)\n-s ${DGRAY}:${NC} Add a suffix (Options: ${GREEN}alpha, beta, release, snapshot${NC})"
 	}
 
 	# Flags are allowed, anything else isn't
@@ -90,7 +89,7 @@ function bump() {
 	apply() {
 		local spec="$major.$minor.$patch$suffix"
 
-		if [ ${is_snapshot}=true ]; then
+		if [ "$is_snapshot" = true ]; then
 			spec="$major.$minor.$patch$suffix-SNAPSHOT"
 		fi
 
@@ -102,18 +101,34 @@ function bump() {
 		return 1
 	}
 
-	while getopts "cS:J:M:P:jmps:" flag; do
+	while getopts "acS:J:M:P:jmps:" flag; do
 		case ${flag} in
+			a)
+				if apply; then
+					if [ "$is_snapshot" = true ]; then
+					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix-SNAPSHOT${GREEN}...${NC}"
+					else
+					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix${GREEN}...${NC}"
+					fi
+					resetOptInd
+					return 0
+				fi
+				return 1
+			;;
 			c)
 				loadCache
-				echo "$major.$minor.$patch$suffix"
+				if [ "$is_snapshot" = true ]; then
+					echo "$major.$minor.$patch$suffix-SNAPSHOT"
+				else
+					echo "$major.$minor.$patch$suffix"
+				fi
 				resetOptInd
-				return 0;
+				return 0
 			;;
 			S)
 				if [ $OPTARG=":" ]; then
 					usage
-					return 1;
+					return 1
 				fi
 
 				if bumpSpecific $OPTARG; then
@@ -156,10 +171,10 @@ function bump() {
 						echo -e "${GREEN}Adding ${LGREEN}-SNAPSHOT${GREEN} suffix...${NC}"
 						is_snapshot=true
 					;;
-					:)
-						suffix=;
-						usage
-						return 1
+					--)
+						echo -e "${GREEN}Removing suffix...${NC}"
+						suffix='';
+						is_snapshot=false
 					;;
 				esac
 			;;
