@@ -6,7 +6,7 @@ servers_dir=$1
 
 # init default
 if [ -z $1 ]; then
-	servers_dir="TestServers/"
+	servers_dir="server/"
 fi
 
 # if not a real directory

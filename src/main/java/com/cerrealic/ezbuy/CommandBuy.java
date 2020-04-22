@@ -20,20 +20,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandBuy implements CommandExecutor, TabCompleter {
-	private EzBuy plugin;
 	private Economy economy;
 	private IEssentials essentials;
-	private String label;
+	public static final String LABEL = "buy";
 	private double buyPriceIncrease;
 	private Player player;
 
-	public CommandBuy(EzBuy plugin) {
-		this.plugin = plugin;
-		label = "buy";
-		economy = plugin.getEconomy();
-		essentials = plugin.getEssentials();
-
-		buyPriceIncrease = plugin.getConfig().getDouble("cost-increase");
+	public CommandBuy() {
+		economy = Context.economy;
+		essentials = Context.essentials;
+		buyPriceIncrease = Context.config.getDouble("cost-increase");
 	}
 
 	private void notifyPlayer(String message, Object... formatArgs) {
@@ -64,17 +60,16 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// Ensure the sender is a player and not a console or command block
 		if (!(sender instanceof Player)) {
-			sender.sendMessage(ChatColor.YELLOW + "The /buy command is only available to "
-					+ "players!");
+			sender.sendMessage(ChatColor.YELLOW + "The /buy command is only available to players!");
 			return true;
 		}
+
+		Context.lastUser = Debug.target = (Player) sender;
 
 		// Ensure correct arg amount
 		if (args.length == 0 || args.length > 2) {
 			return false;
 		}
-
-		player = (Player) sender;
 
 		// Figure out what item was meant with the argument
 		Material item = Material.matchMaterial(args[0]);
@@ -100,8 +95,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			}
 			// Any other kind
 			catch (Exception e) {
-				fail("There was an unexpected error with the amount you entered. Please ask a "
-						+ "server admin for help.");
+				fail("There was an unexpected error with the amount you entered. Please ask a server admin for help.");
 				return false;
 			}
 		}
@@ -137,8 +131,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail("You don't have enough money to buy that many of this item. "
-							+ "The maximum you can buy right now is &e%sx %s&c.",
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.",
 					(int) Math.floor(bal / cost), itemName);
 			alertCost(player, itemName, cost);
 			return;
@@ -174,9 +167,5 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			answers = Arrays.asList("<amount>");
 		}
 		return answers;
-	}
-
-	public String getLabel() {
-		return label;
 	}
 }

@@ -4,3 +4,5 @@
 
 # The multiplication applied to buying prices
 cost-increase: 0.07
+
+debug: false
