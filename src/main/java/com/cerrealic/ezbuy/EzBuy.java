@@ -2,7 +2,6 @@ package com.cerrealic.ezbuy;
 
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.ChatColor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -77,13 +76,5 @@ public class EzBuy extends JavaPlugin {
 
 	private boolean isSpigotServer() {
 		return getServer().getVersion().contains("Spigot");
-	}
-
-	public static String formatColors(String text, Object... formatArgs) {
-		return String.format(ChatColor.translateAlternateColorCodes('&', text), formatArgs);
-	}
-
-	public static String formatMoney(double amount) {
-		return formatColors("&2%s&r", Context.economy.format(amount));
 	}
 }

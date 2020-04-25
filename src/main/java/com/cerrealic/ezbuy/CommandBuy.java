@@ -17,14 +17,14 @@ import org.bukkit.inventory.ItemStack;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class CommandBuy implements CommandExecutor, TabCompleter {
+	public static final String LABEL = "buy";
 	private Economy economy;
 	private IEssentials essentials;
-	public static final String LABEL = "buy";
 	private double buyPriceIncrease;
-	private Player player;
 
 	public CommandBuy() {
 		economy = Context.economy;
@@ -32,17 +32,12 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		buyPriceIncrease = Context.config.getDouble("cost-increase");
 	}
 
-	private void notifyPlayer(String message, Object... formatArgs) {
-		player.sendMessage(EzBuy.formatColors(message, formatArgs));
-	}
-
-	private void alertCost(Player player, String itemName, double cost) {
-		notifyPlayer("&6One (&e1x&6) of &e%s&6 currently costs %s", itemName,
-				EzBuy.formatMoney(cost));
+	private void alertCost(Material material, double cost) {
+		Log.info("One of %s&6 currently costs %s", Format.material(material), Format.money(cost));
 	}
 
 	private void fail(String message, Object... formatArgs) {
-		notifyPlayer("&cPurchase failed: %s&r", message, formatArgs);
+		Log.error("Purchase failed: %s", message, formatArgs);
 	}
 
 	private double getCost(Material item) {
@@ -110,10 +105,9 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		return true;
 	}
 
-	private void buy(Material item, int itemAmount) {
-		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player.getUniqueId());
-		String itemName = item.name().toLowerCase();
-		double cost = getCost(item);
+	private void buy(Material material, int itemAmount) {
+		OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(((Player) Context.lastUser).getUniqueId());
+		double cost = getCost(material);
 
 		if (cost < 0) {
 			return;
@@ -125,15 +119,15 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Ensure the player can buy even one of this item
 		if (bal < cost) {
 			fail("You don't have enough money to buy this item.");
-			alertCost(player, itemName, cost);
+			alertCost(material, cost);
 			return;
 		}
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.",
-					(int) Math.floor(bal / cost), itemName);
-			alertCost(player, itemName, cost);
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", (int) Math.floor(bal / cost),
+					Format.material(material));
+			alertCost(material, cost);
 			return;
 		}
 
@@ -142,30 +136,46 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			player.sendMessage(EzBuy.formatColors("&aBought &e%sx %s&a for %s&a at %s&a each!"
-							+ " You now have %s",
-					itemAmount, itemName, EzBuy.formatMoney(r.amount), EzBuy.formatMoney(cost),
-					EzBuy.formatMoney(r.balance)));
-		} else {
+			Log.success("Bought %s&a for %s&a at %s&a each! You now have %s", Format.item(new ItemStack(material, itemAmount)), Format.money(r.amount), Format.money(cost),
+					Format.money(r.balance));
+		}
+		else {
 			fail(r.errorMessage);
 			return;
 		}
 
 		// Give the items to the player
-		player.getInventory().addItem(new ItemStack(item, itemAmount));
+		((Player) Context.lastUser).getInventory().addItem(new ItemStack(material, itemAmount));
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender,
-			Command command, String alias, String[] args) {
-		List<String> answers = new ArrayList<>();
-		if (args.length == 1) {
-			for (Material material : Material.values()) {
-				answers.add(material.name().toLowerCase());
-			}
-		} else {
-			answers = Arrays.asList("<amount>");
+	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
+		List<String> itemNames = new ArrayList<>();
+		switch (args.length) {
+			case 1:
+				for (Material material : Material.values()) {
+					if (material.isItem() && essentials.getWorth().getPrice(essentials, new ItemStack(material)) != null) {
+						itemNames.add(material.name().toLowerCase());
+					}
+				}
+				break;
+			case 2:
+				itemNames = Collections.singletonList("<amount>");
+				break;
+			default:
+				return null;
 		}
-		return answers;
+
+		// return unfiltered
+		if (args[0].isEmpty()) {
+			return itemNames;
+		}
+
+		// filter based on current input
+		String[] result = itemNames.stream()
+				.filter((name) -> name.startsWith(args[0]))
+				.toArray(String[]::new);
+
+		return Arrays.asList(result);
 	}
 }
