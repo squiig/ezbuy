@@ -1,6 +1,6 @@
 name: EzBuy
 main: com.cerrealic.ezbuy.EzBuy
-version: 0.3.3b
+version: 0.3.4b
 api-version: 1.15
 author: cerrealic
 depend:

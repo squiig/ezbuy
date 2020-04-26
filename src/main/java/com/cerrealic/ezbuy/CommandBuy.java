@@ -37,7 +37,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	}
 
 	private void fail(String message, Object... formatArgs) {
-		Log.error("Purchase failed: %s", message, formatArgs);
+		Log.error("Purchase failed: " + message, formatArgs);
 	}
 
 	private double getCost(Material item) {
@@ -125,8 +125,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", (int) Math.floor(bal / cost),
-					Format.material(material));
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", Format.amount((int) Math.floor(bal / cost)), Format.material(material));
 			alertCost(material, cost);
 			return;
 		}

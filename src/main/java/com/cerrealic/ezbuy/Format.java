@@ -37,7 +37,7 @@ final class Format {
 	}
 
 	static String money(double amount) {
-		return Context.economy.format(amount);
+		return colors(ChatColor.GREEN + Context.economy.format(amount));
 	}
 
 	static String money(BigDecimal amount) {
