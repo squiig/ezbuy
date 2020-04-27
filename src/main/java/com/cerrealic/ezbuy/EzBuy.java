@@ -28,16 +28,13 @@ public class EzBuy extends JavaPlugin {
 
 	boolean checkDependencies() {
 		if (!isSpigotServer()) {
-			getLogger()
-					.severe("You're probably running a CraftBukkit server. For this to plugin to "
-							+ "work you need to switch to Spigot AND use BungeeCord.");
+			getLogger().severe("You're probably running a CraftBukkit server. For this to plugin to work you need to switch to Spigot.");
 			disablePlugin();
 			return false;
 		}
 
 		if (!tryLoadEconomy()) {
-			getLogger().severe("Could not detect an economy service! Something probably went "
-					+ "wrong with Vault.");
+			getLogger().severe("Could not detect an economy service! Something probably went wrong with Vault.");
 			disablePlugin();
 			return false;
 		}
@@ -63,8 +60,7 @@ public class EzBuy extends JavaPlugin {
 	}
 
 	private boolean tryLoadEconomy() {
-		RegisteredServiceProvider<Economy> rsp =
-				getServer().getServicesManager().getRegistration(Economy.class);
+		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
 
 		if (rsp == null) {
 			return false;
