@@ -5,7 +5,7 @@
 function bump() {
 	source ~/color_vars.sh
 
-	local app_dir=;
+	local app_dir=
 	local plugin_yml_file=${app_dir}src/main/resources/plugin.yml
 	local gradle_build_file=${app_dir}build.gradle
 	local cache_file=.bump_cache
@@ -29,16 +29,19 @@ function bump() {
 
 	# Flags are allowed, anything else isn't
 	case $@ in
-		-*) ;;
-		*) usage; return 1 ;;
+	-*) ;;
+	*)
+		usage
+		return 1
+		;;
 	esac
 
 	createCache() {
-		echo ${major} >> ${cache_file}
-		echo ${minor} >> ${cache_file}
-		echo ${patch} >> ${cache_file}
-		echo ${suffix} >> ${cache_file}
-		echo ${is_snapshot} >> ${cache_file}
+		echo ${major} >>${cache_file}
+		echo ${minor} >>${cache_file}
+		echo ${patch} >>${cache_file}
+		echo ${suffix} >>${cache_file}
+		echo ${is_snapshot} >>${cache_file}
 	}
 
 	saveCache() {
@@ -103,82 +106,89 @@ function bump() {
 
 	while getopts "acS:J:M:P:jmps:" flag; do
 		case ${flag} in
-			a)
-				if apply; then
-					if [ "$is_snapshot" = true ]; then
-					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix-SNAPSHOT${GREEN}...${NC}"
-					else
-					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix${GREEN}...${NC}"
-					fi
-					resetOptInd
-					return 0
-				fi
-				return 1
-			;;
-			c)
-				loadCache
+		a)
+			if apply; then
 				if [ "$is_snapshot" = true ]; then
-					echo "$major.$minor.$patch$suffix-SNAPSHOT"
+					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix-SNAPSHOT${GREEN}...${NC}"
 				else
-					echo "$major.$minor.$patch$suffix"
+					echo -e "${GREEN}Applied ${LGREEN}$major.$minor.$patch$suffix${GREEN}...${NC}"
 				fi
 				resetOptInd
 				return 0
+			fi
+			resetOptInd
+			return 1
 			;;
-			S)
-				if [ $OPTARG=":" ]; then
-					usage
-					return 1
-				fi
-
-				if bumpSpecific $OPTARG; then
-					resetOptInd
-					return 0
-				fi
-
+		c)
+			loadCache
+			if [ "$is_snapshot" = true ]; then
+				echo "$major.$minor.$patch$suffix-SNAPSHOT"
+			else
+				echo "$major.$minor.$patch$suffix"
+			fi
+			resetOptInd
+			return 0
+			;;
+		S)
+			if [ $OPTARG=":" ]; then
+				usage
+				resetOptInd
 				return 1
+			fi
+
+			if bumpSpecific $OPTARG; then
+				resetOptInd
+				return 0
+			fi
+
+			resetOptInd
+			return 1
 			;;
-			J) major=$OPTARG ;;
-			M) minor=$OPTARG ;;
-			P) patch=$OPTARG ;;
-			j)
-				echo -e "${GREEN}Incrementing ${LGREEN}major${GREEN} index...${NC}"
-				major=$(($major+1))
+		J) major=$OPTARG ;;
+		M) minor=$OPTARG ;;
+		P) patch=$OPTARG ;;
+		j)
+			echo -e "${GREEN}Incrementing ${LGREEN}major${GREEN} index...${NC}"
+			major=$(($major + 1))
 			;;
-			m)
-				echo -e "${GREEN}Incrementing ${LGREEN}minor${GREEN} index...${NC}"
-				minor=$(($minor+1))
+		m)
+			echo -e "${GREEN}Incrementing ${LGREEN}minor${GREEN} index...${NC}"
+			minor=$(($minor + 1))
 			;;
-			p)
-				echo -e "${GREEN}Incrementing ${LGREEN}patch${GREEN} index...${NC}"
-				patch=$(($patch+1))
+		p)
+			echo -e "${GREEN}Incrementing ${LGREEN}patch${GREEN} index...${NC}"
+			patch=$(($patch + 1))
 			;;
-			s)
-				case $OPTARG in
-					alpha)
-						echo -e "${GREEN}Setting ${LGREEN}alpha${GREEN} suffix...${NC}"
-						suffix='a'
-					;;
-					beta)
-						echo -e "${GREEN}Setting ${LGREEN}beta${GREEN} suffix...${NC}"
-						suffix='b'
-					;;
-					release)
-						echo -e "${GREEN}Setting ${LGREEN}release${GREEN} suffix... (defaults to none)${NC}"
-						suffix=;
-					;;
-					snapshot)
-						echo -e "${GREEN}Adding ${LGREEN}-SNAPSHOT${GREEN} suffix...${NC}"
-						is_snapshot=true
-					;;
-					--)
-						echo -e "${GREEN}Removing suffix...${NC}"
-						suffix='';
-						is_snapshot=false
-					;;
-				esac
+		s)
+			case $OPTARG in
+			alpha)
+				echo -e "${GREEN}Setting ${LGREEN}alpha${GREEN} suffix...${NC}"
+				suffix='a'
+				;;
+			beta)
+				echo -e "${GREEN}Setting ${LGREEN}beta${GREEN} suffix...${NC}"
+				suffix='b'
+				;;
+			release)
+				echo -e "${GREEN}Setting ${LGREEN}release${GREEN} suffix... (defaults to none)${NC}"
+				suffix=
+				;;
+			snapshot)
+				echo -e "${GREEN}Adding ${LGREEN}-SNAPSHOT${GREEN} suffix...${NC}"
+				is_snapshot=true
+				;;
+			--)
+				echo -e "${GREEN}Removing suffix...${NC}"
+				suffix=''
+				is_snapshot=false
+				;;
+			esac
 			;;
-			?) usage; return 1 ;;
+		?)
+			usage
+			resetOptInd
+			return 1
+			;;
 		esac
 	done
 
