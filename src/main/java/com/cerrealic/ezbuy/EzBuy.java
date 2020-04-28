@@ -4,6 +4,7 @@ import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.Debug;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -25,7 +26,17 @@ public class EzBuy extends JavaPlugin {
 		}
 
 		Cerspi.setContext(this, getServer(), getLogger());
-		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
+
+		CommandBuy command = new CommandBuy();
+		PluginCommand pluginCommand = this.getCommand(CommandBuy.LABEL);
+		if (pluginCommand == null) {
+			getLogger().severe(String.format("Failed to register %s command!", CommandBuy.LABEL));
+			Cerspi.disablePlugin();
+			return;
+		}
+
+		pluginCommand.setExecutor(command);
+		pluginCommand.setTabCompleter(command);
 	}
 
 	boolean checkDependencies() {
