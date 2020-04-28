@@ -60,7 +60,7 @@ repositories {
 
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
-	compileOnly 'com.github.squiig:cerspi-lib:latest.release'
+	implementation 'com.github.squiig:cerspi-lib:master-SNAPSHOT'
 
 	compileOnly('com.github.MilkBowl:VaultAPI') {
 		version {

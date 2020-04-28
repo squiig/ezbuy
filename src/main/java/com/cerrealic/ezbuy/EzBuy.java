@@ -1,11 +1,9 @@
 package com.cerrealic.ezbuy;
 
 import com.cerrealic.cerspilib.Cerspi;
-import com.cerrealic.cerspilib.CerspiCommand;
 import com.cerrealic.cerspilib.Debug;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -27,20 +25,7 @@ public class EzBuy extends JavaPlugin {
 		}
 
 		Cerspi.setContext(this, getServer(), getLogger());
-		registerCommand(new CommandBuy());
-	}
-
-	void registerCommand(CerspiCommand command) {
-		String label = command.getLabel();
-		PluginCommand pluginCommand = this.getCommand(label);
-		if (pluginCommand == null) {
-			getLogger().severe(String.format("Failed to register %s command!", label));
-			Cerspi.disablePlugin();
-			return;
-		}
-
-		pluginCommand.setExecutor(command);
-		pluginCommand.setTabCompleter(command);
+		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
 	}
 
 	boolean checkDependencies() {

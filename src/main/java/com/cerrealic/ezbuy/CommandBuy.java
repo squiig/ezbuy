@@ -1,6 +1,5 @@
 package com.cerrealic.ezbuy;
 
-import com.cerrealic.cerspilib.CerspiCommand;
 import com.cerrealic.cerspilib.Debug;
 import com.cerrealic.cerspilib.Format;
 import com.cerrealic.cerspilib.Log;
@@ -12,7 +11,9 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -22,8 +23,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandBuy extends CerspiCommand {
-	private static final String LABEL = "buy";
+public class CommandBuy implements CommandExecutor, TabCompleter {
+	public static final String LABEL = "buy";
 	private Economy economy;
 	private IEssentials essentials;
 	private double buyPriceIncrease;
@@ -32,11 +33,6 @@ public class CommandBuy extends CerspiCommand {
 		economy = Context.economy;
 		essentials = Context.essentials;
 		buyPriceIncrease = Context.config.getDouble("cost-increase");
-	}
-
-	@Override
-	public String getLabel() {
-		return LABEL;
 	}
 
 	private void alertCost(Material material, double cost) {
