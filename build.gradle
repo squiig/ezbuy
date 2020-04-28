@@ -7,6 +7,16 @@ version 'b0.3.5'
 
 sourceCompatibility = 1.8
 
+jar {
+	manifest {
+		attributes('Main-Class': 'com.cerrealic.ezbuy.EzBuy')
+	}
+
+	from {
+		configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+	}
+}
+
 repositories {
 	jcenter()
 	mavenCentral()
@@ -46,6 +56,10 @@ repositories {
 		name = 'papermc'
 		url = 'https://papermc.io/repo/repository/maven-public/'
 	}
+
+	flatDir {
+		dirs 'file://C:/Users/Stan/Dropbox/Development/Projects/Bukkit-Plugins/cerspi-lib/build/libs'
+	}
 }
 
 dependencies {
@@ -62,4 +76,6 @@ dependencies {
 			require '2.17.0'
 		}
 	}
+
+	compileOnly 'com.cerrealic:cerspi-lib-0.1.0-SNAPSHOT'
 }

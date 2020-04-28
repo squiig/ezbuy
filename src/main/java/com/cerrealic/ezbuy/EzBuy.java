@@ -1,8 +1,9 @@
 package com.cerrealic.ezbuy;
 
+import com.cerrealic.cerspilib.Cerspi;
+import com.cerrealic.cerspilib.Debug;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -23,40 +24,24 @@ public class EzBuy extends JavaPlugin {
 			getLogger().info("Debug enabled.");
 		}
 
-		registerCommand();
+		Cerspi.setContext(this, getServer(), getLogger());
+		Cerspi.registerCommand(new CommandBuy());
 	}
 
 	boolean checkDependencies() {
-		if (!isSpigotServer()) {
+		if (!Cerspi.isSpigotServer()) {
 			getLogger().severe("You're probably running a CraftBukkit server. For this to plugin to work you need to switch to Spigot.");
-			disablePlugin();
+			Cerspi.disablePlugin();
 			return false;
 		}
 
 		if (!tryLoadEconomy()) {
 			getLogger().severe("Could not detect an economy service! Something probably went wrong with Vault.");
-			disablePlugin();
+			Cerspi.disablePlugin();
 			return false;
 		}
 
 		return true;
-	}
-
-	void registerCommand() {
-		PluginCommand command = this.getCommand(CommandBuy.LABEL);
-		if (command == null) {
-			getLogger().severe("Failed to register /buy command!");
-			disablePlugin();
-			return;
-		}
-
-		CommandBuy exec = new CommandBuy();
-		command.setExecutor(exec);
-		command.setTabCompleter(exec);
-	}
-
-	public void disablePlugin() {
-		getServer().getPluginManager().disablePlugin(this);
 	}
 
 	private boolean tryLoadEconomy() {
@@ -68,9 +53,5 @@ public class EzBuy extends JavaPlugin {
 
 		Context.economy = rsp.getProvider();
 		return Context.economy != null;
-	}
-
-	private boolean isSpigotServer() {
-		return getServer().getVersion().contains("Spigot");
 	}
 }

@@ -1,5 +1,9 @@
 package com.cerrealic.ezbuy;
 
+import com.cerrealic.cerspilib.CerspiCommand;
+import com.cerrealic.cerspilib.Debug;
+import com.cerrealic.cerspilib.Format;
+import com.cerrealic.cerspilib.Log;
 import com.earth2me.essentials.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -8,9 +12,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,8 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandBuy implements CommandExecutor, TabCompleter {
-	public static final String LABEL = "buy";
+public class CommandBuy extends CerspiCommand {
+	private static final String LABEL = "buy";
 	private Economy economy;
 	private IEssentials essentials;
 	private double buyPriceIncrease;
@@ -30,6 +32,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		economy = Context.economy;
 		essentials = Context.essentials;
 		buyPriceIncrease = Context.config.getDouble("cost-increase");
+	}
+
+	@Override
+	public String getLabel() {
+		return LABEL;
 	}
 
 	private void alertCost(Material material, double cost) {
@@ -125,7 +132,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", Format.amount((int) Math.floor(bal / cost)), Format.material(material));
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", Format.amount((int) Math.floor(bal / cost)),
+					Format.material(material));
 			alertCost(material, cost);
 			return;
 		}
