@@ -11,6 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class EzBuy extends JavaPlugin {
 	@Override
 	public void onEnable() {
+		Cerspi.setContext(this, getServer(), getLogger());
 		if (!checkDependencies()) {
 			return;
 		}
@@ -24,8 +25,6 @@ public class EzBuy extends JavaPlugin {
 		if (Debug.enabled) {
 			getLogger().info("Debug enabled.");
 		}
-
-		Cerspi.setContext(this, getServer(), getLogger());
 
 		CommandBuy command = new CommandBuy();
 		PluginCommand pluginCommand = this.getCommand(CommandBuy.LABEL);
