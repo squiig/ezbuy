@@ -56,10 +56,6 @@ repositories {
 		name = 'papermc'
 		url = 'https://papermc.io/repo/repository/maven-public/'
 	}
-
-	flatDir {
-		dirs 'file://C:/Users/Stan/Dropbox/Development/Projects/Bukkit-Plugins/cerspi-lib/build/libs'
-	}
 }
 
 dependencies {
@@ -76,6 +72,4 @@ dependencies {
 			require '2.17.0'
 		}
 	}
-
-	compileOnly 'com.cerrealic:cerspi-lib-0.1.0-SNAPSHOT'
 }
