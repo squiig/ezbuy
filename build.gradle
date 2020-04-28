@@ -6,6 +6,7 @@ group 'com.cerrealic'
 version 'b0.3.6'
 
 sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 jar {
 	manifest {
