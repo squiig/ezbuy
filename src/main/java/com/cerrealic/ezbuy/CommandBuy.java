@@ -132,10 +132,11 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
+			ItemStack stack = new ItemStack(material, itemAmount);
 			int buyableAmount = (int) Math.floor(bal / cost);
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %sx %s&c which costs %s&c.", Format.amount(buyableAmount), Format.material(material), Format.money(buyableAmount));
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %s&c which costs %s&c.", Format.item(stack), Format.money(buyableAmount * cost));
 			alertCost(material, cost);
-			alertCost(new ItemStack(material, itemAmount), cost);
+			alertCost(stack, cost);
 			return;
 		}
 
