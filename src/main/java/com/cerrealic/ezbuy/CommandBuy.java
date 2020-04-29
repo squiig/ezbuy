@@ -62,7 +62,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			return true;
 		}
 
-		Context.lastUser = Debug.target = (Player) sender;
+		Context.lastUser = Log.target = Debug.target = (Player) sender;
 
 		// Ensure correct arg amount
 		if (args.length == 0 || args.length > 2) {
