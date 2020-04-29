@@ -4,6 +4,7 @@ plugins {
 
 group 'com.cerrealic'
 version 'b0.3.6'
+description 'Simple but effective Spigot plugin that adds a /buy command.'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

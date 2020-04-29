@@ -1,8 +1,9 @@
-name: EzBuy
+name: ${project.name}
+description: ${project.description}
 main: com.cerrealic.ezbuy.EzBuy
-version: b0.3.6
-api-version: 1.15
+version: ${project.version}
 author: cerrealic
+website: https://www.spigotmc.org/resources/ezbuy.77802/
 depend:
   - Vault
   - Essentials
