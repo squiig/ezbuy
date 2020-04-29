@@ -40,7 +40,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	}
 
 	private void alertCost(ItemStack stack, double cost) {
-		Log.info("%s&6 currently costs %s", Format.item(stack), Format.money(cost * stack.getAmount()));
+		Log.info("%s&6 currently costs %s", Format.stack(stack), Format.money(cost * stack.getAmount()));
 	}
 
 	private void fail(String message, Object... formatArgs) {
@@ -133,7 +133,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
 			int buyableAmount = (int) Math.floor(bal / cost);
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %s&c which costs %s&c.", Format.item(new ItemStack(material, buyableAmount)), Format.money(buyableAmount * cost));
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %s&c which costs %s&c.", Format.stack(new ItemStack(material, buyableAmount)), Format.money(buyableAmount * cost));
 			alertCost(material, cost);
 			alertCost(new ItemStack(material, itemAmount), cost);
 			return;
@@ -144,7 +144,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		// Send a message of either success or failure
 		if (r.transactionSuccess()) {
-			Log.success("Bought %s&a for %s&a at %s&a each! You now have %s", Format.item(new ItemStack(material, itemAmount)), Format.money(r.amount), Format.money(cost),
+			Log.success("Bought %s&a for %s&a at %s&a each! You now have %s", Format.stack(new ItemStack(material, itemAmount)), Format.money(r.amount), Format.money(cost),
 					Format.money(r.balance));
 		}
 		else {

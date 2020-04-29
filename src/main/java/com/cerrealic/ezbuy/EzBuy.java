@@ -9,9 +9,12 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EzBuy extends JavaPlugin {
+	public static final int RESOURCE_ID = 77802;
+
 	@Override
 	public void onEnable() {
 		Cerspi.setContext(this, getServer(), getLogger());
+		Cerspi.checkForUpdates(RESOURCE_ID);
 
 		if (!checkDependencies()) {
 			return;
