@@ -3,6 +3,7 @@ description: Simple but effective Spigot plugin that adds a /buy command.
 main: com.cerrealic.ezbuy.EzBuy
 version: b0.3.6-SNAPSHOT
 author: cerrealic
+api-version: 1.15
 website: https://www.spigotmc.org/resources/ezbuy.77802/
 depend:
   - Vault
