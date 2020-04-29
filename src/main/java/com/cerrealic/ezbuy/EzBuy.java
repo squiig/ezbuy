@@ -12,6 +12,7 @@ public class EzBuy extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Cerspi.setContext(this, getServer(), getLogger());
+
 		if (!checkDependencies()) {
 			return;
 		}

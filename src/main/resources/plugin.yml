@@ -1,7 +1,7 @@
-name: ${project.name}
-description: ${project.description}
+name: EzBuy
+description: Simple but effective Spigot plugin that adds a /buy command.
 main: com.cerrealic.ezbuy.EzBuy
-version: ${project.version}
+version: b0.3.6-SNAPSHOT
 author: cerrealic
 website: https://www.spigotmc.org/resources/ezbuy.77802/
 depend:

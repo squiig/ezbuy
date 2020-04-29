@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.cerrealic'
-version 'b0.3.6'
+version 'b0.3.6-SNAPSHOT'
 description 'Simple but effective Spigot plugin that adds a /buy command.'
 
 sourceCompatibility = 1.8
@@ -47,16 +47,16 @@ repositories {
 	}
 
 	maven {
-		url = 'https://jitpack.io'
-	}
-
-	maven {
 		url = 'https://ci.ender.zone/plugin/repository/everything/'
 	}
 
 	maven {
 		name = 'papermc'
 		url = 'https://papermc.io/repo/repository/maven-public/'
+	}
+
+	maven {
+		url = 'https://jitpack.io'
 	}
 }
 
