@@ -39,6 +39,10 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		Log.info("One of %s&6 currently costs %s", Format.material(material), Format.money(cost));
 	}
 
+	private void alertCost(ItemStack stack, double cost) {
+		Log.info("%s&6 currently costs %s", Format.item(stack), Format.money(cost * stack.getAmount()));
+	}
+
 	private void fail(String message, Object... formatArgs) {
 		Log.error("Purchase failed: " + message, formatArgs);
 	}
@@ -131,6 +135,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is &e%sx %s&c.", Format.amount((int) Math.floor(bal / cost)),
 					Format.material(material));
 			alertCost(material, cost);
+			alertCost(new ItemStack(material, itemAmount), cost);
 			return;
 		}
 
