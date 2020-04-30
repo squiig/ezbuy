@@ -14,9 +14,9 @@ public class EzBuy extends JavaPlugin {
 	public void onEnable() {
 		Cerspi.setContext(this, getServer());
 
+		Context.config.options().copyDefaults(true);
 		this.saveDefaultConfig();
 		Context.config = this.getConfig();
-		Context.config.options().copyDefaults(true);
 
 		if (Context.config.getBoolean("update-checking", false)) {
 			Cerspi.checkForUpdates(RESOURCE_ID);
