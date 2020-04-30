@@ -3,7 +3,7 @@ plugins {
 }
 
 group 'com.cerrealic'
-version 'b0.3.6-SNAPSHOT'
+version 'b0.4.0-SNAPSHOT'
 description 'Simple but effective Spigot plugin that adds a /buy command.'
 
 sourceCompatibility = 1.8
@@ -78,5 +78,5 @@ dependencies {
 }
 
 configurations.compile {
-	resolutionStrategy.cacheChangingModulesFor 60, 'seconds'
+	resolutionStrategy.cacheChangingModulesFor 30, 'seconds'
 }

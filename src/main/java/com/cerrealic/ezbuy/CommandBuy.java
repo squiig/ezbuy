@@ -1,8 +1,8 @@
 package com.cerrealic.ezbuy;
 
-import com.cerrealic.cerspilib.Debug;
-import com.cerrealic.cerspilib.Format;
-import com.cerrealic.cerspilib.Log;
+import com.cerrealic.cerspilib.logging.Debug;
+import com.cerrealic.cerspilib.logging.Format;
+import com.cerrealic.cerspilib.logging.Log;
 import com.earth2me.essentials.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -133,7 +133,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		// Ensure the player can buy this exact amount
 		if (bal < totalCost) {
 			int buyableAmount = (int) Math.floor(bal / cost);
-			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %s&c which costs %s&c.", Format.stack(new ItemStack(material, buyableAmount)), Format.money(buyableAmount * cost));
+			fail("You don't have enough money to buy that many of this item. The maximum you can buy right now is %s&c which costs %s&c.",
+					Format.stack(new ItemStack(material, buyableAmount)), Format.money(buyableAmount * cost));
 			alertCost(material, cost);
 			alertCost(new ItemStack(material, itemAmount), cost);
 			return;

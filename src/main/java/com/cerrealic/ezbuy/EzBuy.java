@@ -1,10 +1,9 @@
 package com.cerrealic.ezbuy;
 
 import com.cerrealic.cerspilib.Cerspi;
-import com.cerrealic.cerspilib.Debug;
+import com.cerrealic.cerspilib.logging.Debug;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -13,33 +12,39 @@ public class EzBuy extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
-		Cerspi.setContext(this, getServer(), getLogger());
-		Cerspi.checkForUpdates(RESOURCE_ID);
+		Cerspi.setContext(this, getServer());
+
+		this.saveDefaultConfig();
+		Context.config = this.getConfig();
+//		Context.config.options().copyDefaults(true);
+
+		if (Context.config.getBoolean("update-checking", false)) {
+			Cerspi.checkForUpdates(RESOURCE_ID);
+		}
+
+		Debug.enabled = Context.config.getBoolean("debug", false);
+		if (Debug.enabled) {
+			getLogger().info("Debug enabled.");
+		}
 
 		if (!checkDependencies()) {
 			return;
 		}
 
 		Context.essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
-		Context.config = this.getConfig();
 
-		this.saveDefaultConfig();
+		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
 
-		Debug.enabled = this.getConfig().getBoolean("debug", false);
-		if (Debug.enabled) {
-			getLogger().info("Debug enabled.");
-		}
-
-		CommandBuy command = new CommandBuy();
-		PluginCommand pluginCommand = this.getCommand(CommandBuy.LABEL);
-		if (pluginCommand == null) {
-			getLogger().severe(String.format("Failed to register %s command!", CommandBuy.LABEL));
-			Cerspi.disablePlugin();
-			return;
-		}
-
-		pluginCommand.setExecutor(command);
-		pluginCommand.setTabCompleter(command);
+//		CommandBuy command = new CommandBuy();
+//		PluginCommand pluginCommand = this.getCommand(CommandBuy.LABEL);
+//		if (pluginCommand == null) {
+//			getLogger().severe(String.format("Failed to register %s command!", CommandBuy.LABEL));
+//			Cerspi.disablePlugin();
+//			return;
+//		}
+//
+//		pluginCommand.setExecutor(command);
+//		pluginCommand.setTabCompleter(command);
 	}
 
 	boolean checkDependencies() {
