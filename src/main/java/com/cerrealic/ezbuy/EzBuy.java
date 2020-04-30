@@ -34,17 +34,7 @@ public class EzBuy extends JavaPlugin {
 		Context.essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
 
 		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
-
-//		CommandBuy command = new CommandBuy();
-//		PluginCommand pluginCommand = this.getCommand(CommandBuy.LABEL);
-//		if (pluginCommand == null) {
-//			getLogger().severe(String.format("Failed to register %s command!", CommandBuy.LABEL));
-//			Cerspi.disablePlugin();
-//			return;
-//		}
-//
-//		pluginCommand.setExecutor(command);
-//		pluginCommand.setTabCompleter(command);
+		Cerspi.registerCommand(CommandEzBuy.LABEL, new CommandEzBuy());
 	}
 
 	boolean checkDependencies() {
