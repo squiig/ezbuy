@@ -43,8 +43,8 @@ public class EzBuy extends JavaPlugin {
 	}
 
 	boolean checkDependencies() {
-		if (!Cerspi.isSpigotServer()) {
-			getLogger().severe("You're probably running a CraftBukkit server. For this to plugin to work you need to switch to Spigot.");
+		if (!Cerspi.isSpigotServer() && !Cerspi.isPaperServer()) {
+			getLogger().severe("You're probably running a CraftBukkit server. For this to plugin to work you need to switch to Spigot or Paper.");
 			Cerspi.disablePlugin();
 			return false;
 		}

@@ -77,6 +77,6 @@ dependencies {
 	}
 }
 
-configurations.all {
-	resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+configurations.compile {
+	resolutionStrategy.cacheChangingModulesFor 60, 'seconds'
 }
