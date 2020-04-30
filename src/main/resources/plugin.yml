@@ -9,6 +9,9 @@ depend:
   - Vault
   - Essentials
 commands:
+  ezbuy:
+    description: General command for setting config stuff.
+    usage: /<command> <configkey> <value>
   buy:
     description: Buy items from the server using your balance and the defined worth of the item.
     usage: /<command> <item> <amount>
