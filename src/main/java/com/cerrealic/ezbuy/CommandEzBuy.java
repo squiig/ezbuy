@@ -35,24 +35,27 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 		switch (args[0]) {
 			case "debug":
 				Debug.enabled = !Debug.enabled;
+				config.set("debug", Debug.enabled);
 				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
+				Context.plugin.saveConfig();
 				return true;
 			case "update-checking":
 				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
 				config.set("update-checking", !isCheckingUpdates);
 				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
+				Context.plugin.saveConfig();
 				return true;
 			case "cost-increase":
 				try {
 					double input = Double.parseDouble(args[0]);
 					config.set("cost-increase", input);
 					Log.success("Cost increase set to " + input);
+					Context.plugin.saveConfig();
 					return true;
 				} catch (Exception ex) {
 					Log.error("Please give a valid decimal number.");
 					return false;
 				}
-
 		}
 
 		return false;
