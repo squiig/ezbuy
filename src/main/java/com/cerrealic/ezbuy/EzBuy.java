@@ -66,6 +66,7 @@ public class EzBuy extends JavaPlugin {
 		this.getConfig().addDefault("debug", false);
 		this.getConfig().addDefault("update-checking", true);
 		this.getConfig().addDefault("cost-increase", 0.07d);
+		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
 	}
 }
