@@ -13,18 +13,14 @@ public class EzBuy extends JavaPlugin {
 	@Override
 	public void onEnable() {
 		Cerspi.setContext(this, getServer());
+		Context.plugin = this;
+		initConfig();
 
-		Context.config.addDefault("debug", false);
-		Context.config.addDefault("update-checking", true);
-		Context.config.addDefault("cost-increase", 0.07d);
-		this.saveDefaultConfig();
-		Context.config = this.getConfig();
-
-		if (Context.config.getBoolean("update-checking", false)) {
+		if (this.getConfig().getBoolean("update-checking", false)) {
 			Cerspi.checkForUpdates(RESOURCE_ID);
 		}
 
-		Debug.enabled = Context.config.getBoolean("debug", false);
+		Debug.enabled = this.getConfig().getBoolean("debug", false);
 		if (Debug.enabled) {
 			getLogger().info("Debug enabled.");
 		}
@@ -64,5 +60,12 @@ public class EzBuy extends JavaPlugin {
 
 		Context.economy = rsp.getProvider();
 		return Context.economy != null;
+	}
+
+	private void initConfig() {
+		this.getConfig().addDefault("debug", false);
+		this.getConfig().addDefault("update-checking", true);
+		this.getConfig().addDefault("cost-increase", 0.07d);
+		this.saveDefaultConfig();
 	}
 }

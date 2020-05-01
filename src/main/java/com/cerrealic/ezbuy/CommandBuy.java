@@ -32,7 +32,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	public CommandBuy() {
 		economy = Context.economy;
 		essentials = Context.essentials;
-		buyPriceIncrease = Context.config.getDouble("cost-increase");
+		buyPriceIncrease = Context.plugin.getConfig().getDouble("cost-increase");
 	}
 
 	private void alertCost(Material material, double cost) {

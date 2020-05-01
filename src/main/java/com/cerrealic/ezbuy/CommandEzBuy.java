@@ -6,9 +6,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandEzBuy implements CommandExecutor, TabCompleter {
@@ -29,6 +30,7 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Context.lastUser = Log.target = Debug.target = (Player) sender;
+		FileConfiguration config = Context.plugin.getConfig();
 
 		switch (args[0]) {
 			case "debug":
@@ -36,18 +38,17 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
 				return true;
 			case "update-checking":
-				boolean isCheckingUpdates = Context.config.getBoolean("update-checking", false);
-				Context.config.set("update-checking", !isCheckingUpdates);
+				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
+				config.set("update-checking", !isCheckingUpdates);
 				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
 				return true;
 			case "cost-increase":
 				try {
 					double input = Double.parseDouble(args[0]);
-					Context.config.set("cost-increase", input);
+					config.set("cost-increase", input);
 					Log.success("Cost increase set to " + input);
 					return true;
-				}
-				catch (Exception ex) {
+				} catch (Exception ex) {
 					Log.error("Please give a valid decimal number.");
 					return false;
 				}
@@ -72,6 +73,18 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	 */
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		return Collections.singletonList("debug");
+		List<String> argNames = Arrays.asList("debug", "update-checking", "cost-increase");
+
+		// return unfiltered
+		if (args[0].isEmpty()) {
+			return argNames;
+		}
+
+		// filter based on current input
+		String[] result = argNames.stream()
+				.filter((name) -> name.startsWith(args[0]))
+				.toArray(String[]::new);
+
+		return Arrays.asList(result);
 	}
 }
