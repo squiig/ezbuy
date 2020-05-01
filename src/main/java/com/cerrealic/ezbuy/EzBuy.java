@@ -4,6 +4,7 @@ import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.logging.Debug;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,6 +21,8 @@ public class EzBuy extends JavaPlugin {
 		if (Debug.enabled) {
 			getLogger().info("Debug enabled.");
 		}
+
+		Debug.target = Bukkit.getPlayer("StannuZ58");
 
 		if (this.getConfig().getBoolean("update-checking", false)) {
 			Cerspi.checkForUpdates(RESOURCE_ID);
