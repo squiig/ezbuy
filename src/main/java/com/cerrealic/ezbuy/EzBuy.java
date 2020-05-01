@@ -16,13 +16,13 @@ public class EzBuy extends JavaPlugin {
 		Context.plugin = this;
 		initConfig();
 
-		if (this.getConfig().getBoolean("update-checking", false)) {
-			Cerspi.checkForUpdates(RESOURCE_ID);
-		}
-
 		Debug.enabled = this.getConfig().getBoolean("debug", false);
 		if (Debug.enabled) {
 			getLogger().info("Debug enabled.");
+		}
+
+		if (this.getConfig().getBoolean("update-checking", false)) {
+			Cerspi.checkForUpdates(RESOURCE_ID);
 		}
 
 		if (!checkDependencies()) {
