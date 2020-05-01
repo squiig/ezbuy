@@ -14,7 +14,9 @@ public class EzBuy extends JavaPlugin {
 	public void onEnable() {
 		Cerspi.setContext(this, getServer());
 
-		Context.config.options().copyDefaults(true);
+		Context.config.addDefault("debug", false);
+		Context.config.addDefault("update-checking", true);
+		Context.config.addDefault("cost-increase", 0.07d);
 		this.saveDefaultConfig();
 		Context.config = this.getConfig();
 
