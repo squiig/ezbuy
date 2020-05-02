@@ -2,9 +2,11 @@ package com.cerrealic.ezbuy;
 
 import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.logging.Debug;
+import com.cerrealic.cerspilib.logging.Log;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -36,6 +38,24 @@ public class EzBuy extends JavaPlugin {
 
 		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
 		Cerspi.registerCommand(CommandEzBuy.LABEL, new CommandEzBuy());
+	}
+
+	boolean assertPermission(Player player, String permission) {
+		if (player.hasPermission(permission)) {
+			return true;
+		}
+		Log.error("You don't have permission to use that command.");
+		return false;
+	}
+
+	boolean assertPermissions(Player player, String... permissions) {
+		for (String p : permissions) {
+			if (!player.hasPermission(p)) {
+				Log.error("You don't have permission to use that command.");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	boolean checkDependencies() {

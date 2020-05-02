@@ -14,6 +14,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -25,6 +26,7 @@ import java.util.List;
 
 public class CommandBuy implements CommandExecutor, TabCompleter {
 	public static final String LABEL = "buy";
+	private EzBuy plugin;
 	private Economy economy;
 	private IEssentials essentials;
 	private double buyPriceIncrease;
@@ -32,7 +34,8 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	public CommandBuy() {
 		economy = Context.economy;
 		essentials = Context.essentials;
-		buyPriceIncrease = Context.plugin.getConfig().getDouble("cost-increase");
+		plugin = Context.plugin;
+		buyPriceIncrease = plugin.getConfig().getDouble("cost-increase");
 	}
 
 	private void alertCost(Material material, double cost) {
@@ -58,6 +61,10 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 		return rawCost.doubleValue() * (1 + buyPriceIncrease);
 	}
 
+	private boolean isValidArgumentCount(String[] args) {
+		return (args.length > 0 || args.length < 3);
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		// Ensure the sender is a player and not a console or command block
@@ -68,47 +75,43 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		Context.lastUser = Log.target = Debug.target = (Player) sender;
 
-		// Ensure correct arg amount
-		if (args.length == 0 || args.length > 2) {
-			return false;
+		if (!plugin.assertPermission((Player) sender, Permissions.COMMAND_BUY)) {
+			return true;
 		}
 
-		// Figure out what item was meant with the argument
+		if (!isValidArgumentCount(args))
+			return false;
+
 		Material item = Material.matchMaterial(args[0]);
 
-		// Is the given item name a known item?
+		// Is the given item name a valid item?
 		if (item == null) {
 			fail("Unknown item.");
 			return false;
 		}
 
-		// Define the amount and init with default value if none given
-		int amount = 1;
+		int amountAsked = 1;
 
 		// Only try to parse amount if the arg was given
 		if (args.length > 1) {
 			try {
-				amount = Integer.parseInt(args[1]);
+				amountAsked = Integer.parseInt(args[1]);
 			}
-			// This is the only exception we can expect
 			catch (NumberFormatException ex) {
 				fail("The amount you entered was not a valid number.");
 				return false;
 			}
-			// Any other kind
 			catch (Exception e) {
 				fail("There was an unexpected error with the amount you entered. Please ask a server admin for help.");
 				return false;
 			}
 		}
 
-		// If somehow the amount ended up being 0 or lower anyway, then silently fail for now
-		if (amount <= 0) {
-			return true;
+		if (amountAsked <= 0) {
+			return false;
 		}
 
-		// Execute the order
-		buy(item, amount);
+		buy(item, amountAsked);
 		return true;
 	}
 

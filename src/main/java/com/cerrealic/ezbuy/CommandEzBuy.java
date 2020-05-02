@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.conversations.Conversable;
 import org.bukkit.entity.Player;
 
 import java.util.Arrays;
@@ -14,6 +15,7 @@ import java.util.List;
 
 public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	public static final String LABEL = "ezbuy";
+	private EzBuy plugin;
 
 	/**
 	 * Executes the given command, returning its success.
@@ -29,23 +31,36 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Context.lastUser = Log.target = Debug.target = (Player) sender;
-		FileConfiguration config = Context.plugin.getConfig();
+		Context.lastUser = Log.target = Debug.target = (Conversable) sender;
+		plugin = Context.plugin;
+		FileConfiguration config = plugin.getConfig();
 
 		switch (args[0]) {
 			case "debug":
+				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_DEBUG)) {
+					return true;
+				}
+
 				Debug.enabled = !Debug.enabled;
 				config.set("debug", Debug.enabled);
 				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
 				Context.plugin.saveConfig();
 				return true;
 			case "update-checking":
+				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
+					return true;
+				}
+
 				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
 				config.set("update-checking", !isCheckingUpdates);
 				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
 				Context.plugin.saveConfig();
 				return true;
 			case "cost-increase":
+				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_COST_INCREASE)) {
+					return true;
+				}
+
 				try {
 					double input = Double.parseDouble(args[0]);
 					config.set("cost-increase", input);
