@@ -2,21 +2,22 @@ package com.cerrealic.ezbuy;
 
 import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.logging.Debug;
-import com.cerrealic.cerspilib.logging.Log;
+import com.cerrealic.ezbuy.commands.CommandBuy;
+import com.cerrealic.ezbuy.commands.CommandEzBuy;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EzBuy extends JavaPlugin {
 	public static final int RESOURCE_ID = 77802;
+	public static final Context CONTEXT = new Context();
 
 	@Override
 	public void onEnable() {
 		Cerspi.setContext(this, getServer());
-		Context.plugin = this;
+		CONTEXT.setPlugin(this);
 		initConfig();
 
 		Debug.enabled = this.getConfig().getBoolean("debug", false);
@@ -34,28 +35,10 @@ public class EzBuy extends JavaPlugin {
 			return;
 		}
 
-		Context.essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
+		CONTEXT.setEssentials((Essentials) getServer().getPluginManager().getPlugin("Essentials"));
 
-		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy());
-		Cerspi.registerCommand(CommandEzBuy.LABEL, new CommandEzBuy());
-	}
-
-	boolean assertPermission(Player player, String permission) {
-		if (player.hasPermission(permission)) {
-			return true;
-		}
-		Log.error("You don't have permission to use that command.");
-		return false;
-	}
-
-	boolean assertPermissions(Player player, String... permissions) {
-		for (String p : permissions) {
-			if (!player.hasPermission(p)) {
-				Log.error("You don't have permission to use that command.");
-				return false;
-			}
-		}
-		return true;
+		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy(this, CONTEXT.getEconomy(), CONTEXT.getEssentials()));
+		Cerspi.registerCommand(CommandEzBuy.LABEL, new CommandEzBuy(this));
 	}
 
 	boolean checkDependencies() {
@@ -81,8 +64,8 @@ public class EzBuy extends JavaPlugin {
 			return false;
 		}
 
-		Context.economy = rsp.getProvider();
-		return Context.economy != null;
+		CONTEXT.setEconomy(rsp.getProvider());
+		return CONTEXT.getEconomy() != null;
 	}
 
 	private void initConfig() {

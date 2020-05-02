@@ -1,6 +1,7 @@
 package com.cerrealic.ezbuy;
 
 public final class Permissions {
+	public static final String COMMAND_ALL = "ezbuy.command.*";
 	public static final String COMMAND_BUY = "ezbuy.command.buy";
 	public static final String COMMAND_EZBUY_ALL = "ezbuy.command.ezbuy.*";
 	public static final String COMMAND_DEBUG = "ezbuy.command.ezbuy.debug";

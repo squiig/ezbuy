@@ -1,7 +1,10 @@
-package com.cerrealic.ezbuy;
+package com.cerrealic.ezbuy.commands;
 
+import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.logging.Debug;
 import com.cerrealic.cerspilib.logging.Log;
+import com.cerrealic.ezbuy.EzBuy;
+import com.cerrealic.ezbuy.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,6 +20,10 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	public static final String LABEL = "ezbuy";
 	private EzBuy plugin;
 
+	public CommandEzBuy(EzBuy plugin) {
+		this.plugin = plugin;
+	}
+
 	/**
 	 * Executes the given command, returning its success.
 	 * <br>
@@ -31,33 +38,32 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		Context.lastUser = Log.target = Debug.target = (Conversable) sender;
-		plugin = Context.plugin;
+		Log.target = Debug.target = (Conversable) sender;
 		FileConfiguration config = plugin.getConfig();
 
 		switch (args[0]) {
 			case "debug":
-				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_DEBUG)) {
+				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_DEBUG)) {
 					return true;
 				}
 
 				Debug.enabled = !Debug.enabled;
 				config.set("debug", Debug.enabled);
 				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
-				Context.plugin.saveConfig();
+				plugin.saveConfig();
 				return true;
 			case "update-checking":
-				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
+				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
 					return true;
 				}
 
 				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
 				config.set("update-checking", !isCheckingUpdates);
 				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
-				Context.plugin.saveConfig();
+				plugin.saveConfig();
 				return true;
 			case "cost-increase":
-				if (sender instanceof Player && !plugin.assertPermissions((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_COST_INCREASE)) {
+				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_COST_INCREASE)) {
 					return true;
 				}
 
@@ -65,7 +71,7 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 					double input = Double.parseDouble(args[0]);
 					config.set("cost-increase", input);
 					Log.success("Cost increase set to " + input);
-					Context.plugin.saveConfig();
+					plugin.saveConfig();
 					return true;
 				} catch (Exception ex) {
 					Log.error("Please give a valid decimal number.");
