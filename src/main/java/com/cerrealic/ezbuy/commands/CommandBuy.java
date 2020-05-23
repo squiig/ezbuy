@@ -132,7 +132,7 @@ public class CommandBuy extends CerspiCommand {
 
 		EconomyResponse response = economy.withdrawPlayer(offlinePlayer, totalPrice);
 		if (response.transactionSuccess()) {
-			Log.success("Bought %s&a for %s&a at %s&a each! You now have %s", Format.stack(new ItemStack(orderedMaterial, orderedAmount)), Format.money(response.amount), Format.money(singlePrice),
+			Log.success("Bought %s&a for %s&a at %s&a each! You now have %s", false, Format.stack(new ItemStack(orderedMaterial, orderedAmount)), Format.money(response.amount), Format.money(singlePrice),
 					Format.money(response.balance));
 		}
 		else {
@@ -195,14 +195,14 @@ public class CommandBuy extends CerspiCommand {
 	}
 
 	private void alertCost(Material material, double cost) {
-		Log.info("One of %s&6 currently costs %s", Format.material(material), Format.money(cost));
+		Log.info("One of %s&6 currently costs %s", false, Format.material(material), Format.money(cost));
 	}
 
 	private void alertCost(ItemStack stack, double cost) {
-		Log.info("%s&6 currently costs %s", Format.stack(stack), Format.money(cost * stack.getAmount()));
+		Log.info("%s&6 currently costs %s", false, Format.stack(stack), Format.money(cost * stack.getAmount()));
 	}
 
 	private void fail(String message, Object... formatArgs) {
-		Log.error("Purchase failed: " + message, formatArgs);
+		Log.error("Purchase failed: " + message, false, formatArgs);
 	}
 }

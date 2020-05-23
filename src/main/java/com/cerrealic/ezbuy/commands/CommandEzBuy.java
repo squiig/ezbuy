@@ -54,9 +54,7 @@ public class CommandEzBuy extends CerspiCommand {
 
 		switch (args[0]) {
 			case OPT_DEBUG:
-				Debug.enabled = !Debug.enabled;
-				config.setDebugMode(Debug.enabled);
-				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
+				ezBuy.setDebugMode(!Debug.enabled);
 				return true;
 //			case "update-checking":
 //				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
@@ -74,12 +72,12 @@ public class CommandEzBuy extends CerspiCommand {
 				try {
 					input = Double.parseDouble(args[0]);
 				} catch (Exception ex) {
-					Log.error("Please give a valid decimal number.");
+					Log.error("Please give a valid decimal number.", false);
 					return false;
 				}
 
 				config.setProfitRate(input);
-				Log.success("Profit rate set to " + input);
+				Log.success("Profit rate set to " + input, false);
 				return true;
 		}
 

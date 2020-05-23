@@ -40,7 +40,7 @@ public class EzBuy extends CerspiPlugin {
 		super.onEnable();
 		context = new EzBuyContext((Essentials) getServer().getPluginManager().getPlugin("Essentials"), null);
 
-		Cerspi.registerCommands(
+		Cerspi.registerCommands(this, true,
 				new CommandBuy(this, context),
 				new CommandEzBuy(this)
 		);
@@ -50,7 +50,7 @@ public class EzBuy extends CerspiPlugin {
 	protected CerspiPluginConfig initConfig() {
 		this.getConfig().options().copyDefaults(true);
 		this.saveDefaultConfig();
-		config = new EzBuyConfig(this.getConfig());
+		config = new EzBuyConfig(this, this.getConfig());
 		return config;
 	}
 
@@ -66,7 +66,7 @@ public class EzBuy extends CerspiPlugin {
 
 		if (!tryLoadEconomy()) {
 			getLogger().severe("Could not detect an economy service! Something probably went wrong with Vault.");
-			Cerspi.disablePlugin();
+			Cerspi.disablePlugin(this);
 			return false;
 		}
 
