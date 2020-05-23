@@ -1,50 +1,66 @@
 package com.cerrealic.ezbuy;
 
 import com.cerrealic.cerspilib.Cerspi;
-import com.cerrealic.cerspilib.logging.Debug;
+import com.cerrealic.cerspilib.CerspiPlugin;
+import com.cerrealic.cerspilib.config.CerspiPluginConfig;
 import com.cerrealic.ezbuy.commands.CommandBuy;
 import com.cerrealic.ezbuy.commands.CommandEzBuy;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
+import org.bukkit.plugin.java.annotation.plugin.Description;
+import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
-public class EzBuy extends JavaPlugin {
-	public static final int RESOURCE_ID = 77802;
-	public static final Context CONTEXT = new Context();
+@Plugin(name = "EzBuy", version = "b0.4.0-SNAPSHOT")
+@Description(value = "Simple but effective Spigot plugin that adds a /buy command.")
+@Author(value = "cerrealic")
+@ApiVersion(ApiVersion.Target.v1_15)
+public class EzBuy extends CerspiPlugin {
+	private static final int RESOURCE_ID = 77802;
+	private EzBuyContext context;
+	private EzBuyConfig config;
+
+	public EzBuyContext getContext() {
+		return context;
+	}
+
+	public static EzBuy getInstance() {
+		return EzBuy.getPlugin(EzBuy.class);
+	}
+
+	@Override
+	public Integer getResourceId() {
+		return RESOURCE_ID;
+	}
 
 	@Override
 	public void onEnable() {
-		Cerspi.setContext(this, getServer());
-		CONTEXT.setPlugin(this);
-		initConfig();
+		super.onEnable();
+		context = new EzBuyContext((Essentials) getServer().getPluginManager().getPlugin("Essentials"), null);
 
-		Debug.enabled = this.getConfig().getBoolean("debug", false);
-		if (Debug.enabled) {
-			getLogger().info("Debug enabled.");
-		}
-
-		Debug.target = Bukkit.getPlayer("StannuZ58");
-
-		if (this.getConfig().getBoolean("update-checking", false)) {
-			Cerspi.checkForUpdates(RESOURCE_ID);
-		}
-
-		if (!checkDependencies()) {
-			return;
-		}
-
-		CONTEXT.setEssentials((Essentials) getServer().getPluginManager().getPlugin("Essentials"));
-
-		Cerspi.registerCommand(CommandBuy.LABEL, new CommandBuy(this, CONTEXT.getEconomy(), CONTEXT.getEssentials()));
-		Cerspi.registerCommand(CommandEzBuy.LABEL, new CommandEzBuy(this));
+		Cerspi.registerCommands(
+				new CommandBuy(this, context),
+				new CommandEzBuy(this)
+		);
 	}
 
-	boolean checkDependencies() {
-		if (!Cerspi.isSpigotServer() && !Cerspi.isPaperServer()) {
-			getLogger().severe("You're probably running a CraftBukkit server. For this to plugin to work you need to switch to Spigot or Paper.");
-			Cerspi.disablePlugin();
+	@Override
+	protected CerspiPluginConfig initConfig() {
+		this.getConfig().options().copyDefaults(true);
+		this.saveDefaultConfig();
+		config = new EzBuyConfig(this.getConfig());
+		return config;
+	}
+
+	public EzBuyConfig getEzBuyConfig() {
+		return config;
+	}
+
+	@Override
+	protected boolean checkDependencies() {
+		if (!super.checkDependencies()) {
 			return false;
 		}
 
@@ -64,15 +80,7 @@ public class EzBuy extends JavaPlugin {
 			return false;
 		}
 
-		CONTEXT.setEconomy(rsp.getProvider());
-		return CONTEXT.getEconomy() != null;
-	}
-
-	private void initConfig() {
-		this.getConfig().addDefault("debug", false);
-		this.getConfig().addDefault("update-checking", true);
-		this.getConfig().addDefault("cost-increase", 0.07d);
-		this.getConfig().options().copyDefaults(true);
-		this.saveDefaultConfig();
+		context.setEconomy(rsp.getProvider());
+		return context.getEconomy() != null;
 	}
 }

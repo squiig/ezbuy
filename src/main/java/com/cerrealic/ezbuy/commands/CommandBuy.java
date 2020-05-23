@@ -1,11 +1,11 @@
 package com.cerrealic.ezbuy.commands;
 
-import com.cerrealic.cerspilib.Cerspi;
+import com.cerrealic.cerspilib.CerspiCommand;
 import com.cerrealic.cerspilib.logging.Debug;
 import com.cerrealic.cerspilib.logging.Format;
 import com.cerrealic.cerspilib.logging.Log;
 import com.cerrealic.ezbuy.EzBuy;
-import com.cerrealic.ezbuy.Permissions;
+import com.cerrealic.ezbuy.EzBuyContext;
 import com.earth2me.essentials.IEssentials;
 import net.milkbowl.vault.economy.Economy;
 import net.milkbowl.vault.economy.EconomyResponse;
@@ -14,9 +14,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -26,18 +24,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class CommandBuy implements CommandExecutor, TabCompleter {
-	public static final String LABEL = "buy";
-	private EzBuy plugin;
-	private Economy economy;
+public class CommandBuy extends CerspiCommand {
+	private static final String LABEL = "buy";
 	private IEssentials essentials;
+	private Economy economy;
 	private double costIncrease;
 
-	public CommandBuy(EzBuy plugin, Economy economy, IEssentials essentials) {
-		this.plugin = plugin;
-		this.economy = economy;
-		this.essentials = essentials;
+	public CommandBuy(EzBuy plugin, EzBuyContext context) {
+		this.essentials = context.getEssentials();
+		this.economy = context.getEconomy();
 		costIncrease = plugin.getConfig().getDouble("cost-increase");
+	}
+
+	@Override
+	public String getLabel() {
+		return LABEL;
 	}
 
 	@Override
@@ -49,10 +50,6 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 
 		Player player = (Player) sender;
 		Log.target = Debug.target = player;
-
-		if (!Cerspi.assertPermission(player, Permissions.COMMAND_BUY, Permissions.COMMAND_ALL)) {
-			return true;
-		}
 
 		if (!assertValidArgs(args))
 			return false;
@@ -194,7 +191,7 @@ public class CommandBuy implements CommandExecutor, TabCompleter {
 	}
 
 	private boolean assertValidArgs(String[] args) {
-		return (args.length > 0 || args.length < 3);
+		return (args.length > 0 && args.length < 3);
 	}
 
 	private void alertCost(Material material, double cost) {

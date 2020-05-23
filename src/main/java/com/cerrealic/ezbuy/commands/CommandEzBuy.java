@@ -1,27 +1,30 @@
 package com.cerrealic.ezbuy.commands;
 
-import com.cerrealic.cerspilib.Cerspi;
+import com.cerrealic.cerspilib.CerspiCommand;
 import com.cerrealic.cerspilib.logging.Debug;
 import com.cerrealic.cerspilib.logging.Log;
 import com.cerrealic.ezbuy.EzBuy;
-import com.cerrealic.ezbuy.Permissions;
+import com.cerrealic.ezbuy.EzBuyConfig;
 import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.conversations.Conversable;
-import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class CommandEzBuy implements CommandExecutor, TabCompleter {
+public class CommandEzBuy extends CerspiCommand {
 	public static final String LABEL = "ezbuy";
-	private EzBuy plugin;
+	private static final String OPT_DEBUG = "debug";
+	private static final String OPT_PROFIT_RATE = "profitRate";
+	private EzBuy ezBuy;
 
-	public CommandEzBuy(EzBuy plugin) {
-		this.plugin = plugin;
+	public CommandEzBuy(EzBuy ezBuy) {
+		this.ezBuy = ezBuy;
+	}
+
+	@Override
+	public String getLabel() {
+		return LABEL;
 	}
 
 	/**
@@ -38,45 +41,46 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	 */
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+		if (args.length <= 0) {
+			return false;
+		}
+
+		if (!(sender instanceof Conversable)) {
+			return true;
+		}
+
 		Log.target = Debug.target = (Conversable) sender;
-		FileConfiguration config = plugin.getConfig();
+		EzBuyConfig config = ezBuy.getEzBuyConfig();
 
 		switch (args[0]) {
-			case "debug":
-				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_DEBUG)) {
-					return true;
-				}
-
+			case OPT_DEBUG:
 				Debug.enabled = !Debug.enabled;
-				config.set("debug", Debug.enabled);
+				config.setDebugMode(Debug.enabled);
 				Log.success("Debug " + (Debug.enabled ? "enabled" : "disabled") + ".");
-				plugin.saveConfig();
 				return true;
-			case "update-checking":
-				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
-					return true;
-				}
-
-				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
-				config.set("update-checking", !isCheckingUpdates);
-				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
-				plugin.saveConfig();
-				return true;
-			case "cost-increase":
-				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_COST_INCREASE)) {
-					return true;
-				}
+//			case "update-checking":
+//				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
+//					return true;
+//				}
+//
+//				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
+//				config.set("update-checking", !isCheckingUpdates);
+//				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
+//				plugin.saveConfig();
+//				return true;
+			case OPT_PROFIT_RATE:
+				double input;
 
 				try {
-					double input = Double.parseDouble(args[0]);
-					config.set("cost-increase", input);
-					Log.success("Cost increase set to " + input);
-					plugin.saveConfig();
-					return true;
+					input = Double.parseDouble(args[0]);
 				} catch (Exception ex) {
 					Log.error("Please give a valid decimal number.");
 					return false;
 				}
+
+				config.setProfitRate(input);
+				Log.success("Profit rate set to " + input);
+				return true;
 		}
 
 		return false;
@@ -97,7 +101,7 @@ public class CommandEzBuy implements CommandExecutor, TabCompleter {
 	 */
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
-		List<String> argNames = Arrays.asList("debug", "update-checking", "cost-increase");
+		List<String> argNames = Arrays.asList(OPT_DEBUG, OPT_PROFIT_RATE);
 
 		// return unfiltered
 		if (args[0].isEmpty()) {

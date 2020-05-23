@@ -7,7 +7,6 @@ version 'b0.4.0-SNAPSHOT'
 description 'Simple but effective Spigot plugin that adds a /buy command.'
 
 sourceCompatibility = 1.8
-targetCompatibility = 1.8
 
 jar {
 	manifest {
@@ -62,9 +61,9 @@ repositories {
 
 dependencies {
 	compileOnly 'org.spigotmc:spigot-api:1.15.2-R0.1-SNAPSHOT' // The Spigot API with no shadowing. Requires the OSS repo.
-	compile 'com.github.squiig:cerspi-lib:master-SNAPSHOT'
 	compileOnly 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
 	annotationProcessor 'org.spigotmc:plugin-annotations:1.2.3-SNAPSHOT'
+	compile 'com.github.squiig:cerspi-lib:3.2'
 
 	compileOnly('com.github.MilkBowl:VaultAPI') {
 		version {
