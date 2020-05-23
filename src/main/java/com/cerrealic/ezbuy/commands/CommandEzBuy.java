@@ -1,17 +1,49 @@
 package com.cerrealic.ezbuy.commands;
 
+import com.cerrealic.cerspilib.Cerspi;
 import com.cerrealic.cerspilib.CerspiCommand;
-import com.cerrealic.cerspilib.logging.Debug;
-import com.cerrealic.cerspilib.logging.Log;
+import com.cerrealic.cerspilib.logging.Formatter;
 import com.cerrealic.ezbuy.EzBuy;
 import com.cerrealic.ezbuy.EzBuyConfig;
+import com.cerrealic.ezbuy.Permissions;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.conversations.Conversable;
+import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionDefault;
+import org.bukkit.plugin.java.annotation.command.Commands;
+import org.bukkit.plugin.java.annotation.permission.Permission;
 
 import java.util.Arrays;
 import java.util.List;
 
+@Commands(
+		@org.bukkit.plugin.java.annotation.command.Command(
+				name = "ezbuy",
+				desc = "General EzBuy command.",
+				usage = "/<command> <option>",
+				permission = Permissions.COMMAND_EZBUY
+		)
+)
+@org.bukkit.plugin.java.annotation.permission.Permissions(
+		{
+				@Permission(
+						name = Permissions.COMMAND_EZBUY,
+						desc = "Allows use of the /ezbuy command.",
+						defaultValue = PermissionDefault.OP
+				),
+				@Permission(
+						name = Permissions.COMMAND_EZBUY_DEBUG,
+						desc = "Allows toggling debug mode.",
+						defaultValue = PermissionDefault.FALSE
+				),
+				@Permission(
+						name = Permissions.COMMAND_EZBUY_PROFITRATE,
+						desc = "Allows setting profit rate.",
+						defaultValue = PermissionDefault.FALSE
+				)
+		}
+)
 public class CommandEzBuy extends CerspiCommand {
 	public static final String LABEL = "ezbuy";
 	private static final String OPT_DEBUG = "debug";
@@ -49,35 +81,30 @@ public class CommandEzBuy extends CerspiCommand {
 			return true;
 		}
 
-		Log.target = Debug.target = (Conversable) sender;
+		Player player = (Player) sender;
+		ezBuy.getCerspiLogger().setTarget((Conversable) sender);
 		EzBuyConfig config = ezBuy.getEzBuyConfig();
 
 		switch (args[0]) {
 			case OPT_DEBUG:
-				ezBuy.setDebugMode(!Debug.enabled);
-				return true;
-//			case "update-checking":
-//				if (sender instanceof Player && !Cerspi.assertPermission((Player) sender, Permissions.COMMAND_EZBUY_ALL, Permissions.COMMAND_UPDATE_CHECKING)) {
-//					return true;
-//				}
-//
-//				boolean isCheckingUpdates = config.getBoolean("update-checking", false);
-//				config.set("update-checking", !isCheckingUpdates);
-//				Log.success("Update checking " + (!isCheckingUpdates ? "enabled" : "disabled") + ".");
-//				plugin.saveConfig();
-//				return true;
-			case OPT_PROFIT_RATE:
-				double input;
-
-				try {
-					input = Double.parseDouble(args[0]);
-				} catch (Exception ex) {
-					Log.error("Please give a valid decimal number.", false);
-					return false;
+				if (Cerspi.assertPermissions(ezBuy, player, Permissions.COMMAND_EZBUY_DEBUG)) {
+					ezBuy.setDebugMode(!ezBuy.getDebugger().isEnabled());
 				}
+				return true;
+			case OPT_PROFIT_RATE:
+				if (Cerspi.assertPermissions(ezBuy, player, Permissions.COMMAND_EZBUY_PROFITRATE)) {
+					double input;
 
-				config.setProfitRate(input);
-				Log.success("Profit rate set to " + input, false);
+					try {
+						input = Double.parseDouble(args[0]);
+					} catch (Exception ex) {
+						ezBuy.getCerspiLogger().log(new Formatter("Please give a valid decimal number.").stylizeError().toString(), false);
+						return false;
+					}
+
+					config.setProfitRate(input);
+					ezBuy.getCerspiLogger().log(new Formatter("Profit rate set to " + input).stylizeSuccess().toString(), false);
+				}
 				return true;
 		}
 

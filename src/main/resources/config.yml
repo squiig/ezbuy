@@ -2,7 +2,7 @@
 # EzBuy Config
 
 # The multiplication applied to buying prices
-cost-increase: 0.07
+profit-rate: 0.07
 
-update-checking: true
+check-for-updates: true
 debug: false

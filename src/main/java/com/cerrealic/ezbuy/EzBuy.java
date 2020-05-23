@@ -7,16 +7,39 @@ import com.cerrealic.ezbuy.commands.CommandBuy;
 import com.cerrealic.ezbuy.commands.CommandEzBuy;
 import com.earth2me.essentials.Essentials;
 import net.milkbowl.vault.economy.Economy;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.RegisteredServiceProvider;
+import org.bukkit.plugin.java.annotation.dependency.Dependency;
+import org.bukkit.plugin.java.annotation.permission.ChildPermission;
+import org.bukkit.plugin.java.annotation.permission.Permission;
 import org.bukkit.plugin.java.annotation.plugin.ApiVersion;
 import org.bukkit.plugin.java.annotation.plugin.Description;
 import org.bukkit.plugin.java.annotation.plugin.Plugin;
+import org.bukkit.plugin.java.annotation.plugin.Website;
 import org.bukkit.plugin.java.annotation.plugin.author.Author;
 
 @Plugin(name = "EzBuy", version = "b0.4.0-SNAPSHOT")
-@Description(value = "Simple but effective Spigot plugin that adds a /buy command.")
-@Author(value = "cerrealic")
+@Description("Simple but effective Spigot plugin that adds a /buy command.")
+@Author("cerrealic")
 @ApiVersion(ApiVersion.Target.v1_15)
+@Website("https://www.spigotmc.org/resources/ezbuy.77802/")
+@Dependency("Vault")
+@Dependency("Essentials")
+@org.bukkit.plugin.java.annotation.permission.Permissions(
+		{
+				@Permission(
+						name = Permissions.COMMAND_ALL,
+						desc = "Allows every command.",
+						defaultValue = PermissionDefault.OP,
+						children = {
+								@ChildPermission(name = Permissions.COMMAND_EZBUY),
+								@ChildPermission(name = Permissions.COMMAND_EZBUY_DEBUG),
+								@ChildPermission(name = Permissions.COMMAND_EZBUY_PROFITRATE),
+								@ChildPermission(name = Permissions.COMMAND_BUY)
+						}
+				)
+		}
+)
 public class EzBuy extends CerspiPlugin {
 	private static final int RESOURCE_ID = 77802;
 	private EzBuyContext context;
